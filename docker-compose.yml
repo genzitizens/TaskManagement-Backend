@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: database
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: Notes
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - shared_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U username -d Notes" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dbgate:
+    image: dbgate/dbgate:latest
+    container_name: dbGate
+    ports:
+      - "3000:3000"
+    networks:
+      - shared_network
+
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile # Refers to the Dockerfile for your Spring Boot app
+    container_name: notesService
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/Notes
+      SPRING_DATASOURCE_USERNAME: username
+      SPRING_DATASOURCE_PASSWORD: password
+    volumes:
+      - ./db-changelog:/app/db-changelog  # Mounts liquibase change log
+      - ./secret-keys/jwt-access.key:/app/secret-keys/jwt-access.key  # Mount Access Key for JWT
+      - ./secret-keys/enc-secret.key:/app/secret-keys/enc-secret.key  # Mount Secret Key for Encryption
+    depends_on:
+      postgres:
+        condition: service_healthy  #  Ensures dbGate Container starts only after Postgres Database is ready
+    networks:
+      - shared_network # Attach to the shared network
+
+volumes:
+  postgres_data:
+
+networks:
+  shared_network:
+    external: true # Declare the shared network as external
