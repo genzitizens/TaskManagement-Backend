@@ -7,16 +7,17 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: TaskDB
     ports:
-      - "5433:5432"
+      - "5433:5432"  # host:container (container stays 5432)
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - shared_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U username -d TaskDB" ]
+      test: ["CMD-SHELL", "pg_isready -U username -d TaskDB -p 5432"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: always
 
   dbgate:
     image: dbgate/dbgate:latest
@@ -25,29 +26,39 @@ services:
       - "3000:3000"
     networks:
       - shared_network
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   springboot-app:
     build:
       context: .
-      dockerfile: Dockerfile # Refers to the Dockerfile for your Spring Boot app
+      dockerfile: Dockerfile
     container_name: notesService
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/TaskDB
+      # Containers talk to the postgres *service name* on its container port 5432
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/TaskDB
       SPRING_DATASOURCE_USERNAME: username
       SPRING_DATASOURCE_PASSWORD: password
+
+      # If you want to use the mounted changelog instead of classpath:
+      SPRING_LIQUIBASE_CHANGE_LOG: file:/app/db-changelog/changelog-master.sql
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
     volumes:
-      - ./db-changelog:/app/db-changelog/changelog-master.sql  # Mounts liquibase change log
+      # Mount the *folder* to a folder (not to a file path)
+      - ./db-changelog:/app/db-changelog
     depends_on:
       postgres:
-        condition: service_healthy  #  Ensures dbGate Container starts only after Postgres Database is ready
+        condition: service_healthy
     networks:
-      - shared_network # Attach to the shared network
+      - shared_network
+    restart: always
 
 volumes:
   postgres_data:
 
 networks:
   shared_network:
-    external: true # Declare the shared network as external
+    external: true
