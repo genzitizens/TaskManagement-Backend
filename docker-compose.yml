@@ -5,15 +5,15 @@ services:
     environment:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: Notes
+      POSTGRES_DB: TaskDB
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - shared_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U username -d Notes" ]
+      test: [ "CMD-SHELL", "pg_isready -U username -d TaskDB" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,13 +34,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/Notes
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5433/TaskDB
       SPRING_DATASOURCE_USERNAME: username
       SPRING_DATASOURCE_PASSWORD: password
     volumes:
-      - ./db-changelog:/app/db-changelog  # Mounts liquibase change log
-      - ./secret-keys/jwt-access.key:/app/secret-keys/jwt-access.key  # Mount Access Key for JWT
-      - ./secret-keys/enc-secret.key:/app/secret-keys/enc-secret.key  # Mount Secret Key for Encryption
+      - ./db-changelog:/app/db-changelog/changelog-master.sql  # Mounts liquibase change log
     depends_on:
       postgres:
         condition: service_healthy  #  Ensures dbGate Container starts only after Postgres Database is ready
