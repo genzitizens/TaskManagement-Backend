@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15
-    container_name: database
+    container_name: taskDB
     environment:
       POSTGRES_USER: username
       POSTGRES_PASSWORD: password
@@ -21,7 +21,7 @@ services:
 
   dbgate:
     image: dbgate/dbgate:latest
-    container_name: dbGate
+    container_name: taskDB-dbGate
     ports:
       - "3000:3000"
     networks:
@@ -34,9 +34,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: notesService
+    container_name: task-management-service
     ports:
-      - "8080:8080"
+      - "8002:8002"
     environment:
       # Containers talk to the postgres *service name* on its container port 5432
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/TaskDB
