@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
                 contact = @Contact(name = "Task Management Team", email = "support@example.com")
         ),
         servers = {
-                @Server(url = "http://localhost:8080", description = "Local Server")
+                @Server(url = "http://localhost:8002", description = "Local server (default port)")
         },
         tags = {
                 @Tag(name = "Projects", description = "Operations about projects"),
