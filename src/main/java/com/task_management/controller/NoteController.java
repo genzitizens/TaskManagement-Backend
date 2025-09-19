@@ -4,9 +4,14 @@ import com.task_management.dto.NoteCreateReq;
 import com.task_management.dto.NoteRes;
 import com.task_management.exception.BadRequestException;
 import com.task_management.service.NoteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -24,20 +29,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/notes")
 @RequiredArgsConstructor
+@Tag(name = "Notes")
 public class NoteController {
 
     private final NoteService noteService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Create note",
+            description = "Creates a new note linked to a project or a task.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Note created"),
+                    @ApiResponse(responseCode = "400", description = "Validation failure or missing association")
+            }
+    )
     public NoteRes create(@Valid @RequestBody NoteCreateReq req) {
         return noteService.create(req);
     }
 
     @GetMapping
-    public Page<NoteRes> list(@RequestParam(value = "projectId", required = false) UUID projectId,
+    @Operation(
+            summary = "List notes",
+            description = "Lists notes for a project or a task. Exactly one identifier must be provided.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Page of notes retrieved"),
+                    @ApiResponse(responseCode = "400", description = "Both identifiers provided or missing"),
+                    @ApiResponse(responseCode = "404", description = "Project or task not found")
+            }
+    )
+    public Page<NoteRes> list(@Parameter(description = "Project identifier", required = false)
+                              @RequestParam(value = "projectId", required = false) UUID projectId,
+                              @Parameter(description = "Task identifier", required = false)
                               @RequestParam(value = "taskId", required = false) UUID taskId,
-                              @PageableDefault(size = 20) Pageable pageable) {
+                              @ParameterObject @PageableDefault(size = 20) Pageable pageable) {
         boolean hasProject = projectId != null;
         boolean hasTask = taskId != null;
         if (hasProject == hasTask) {
@@ -50,7 +75,15 @@ public class NoteController {
 
     @DeleteMapping("/{noteId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID noteId) {
+    @Operation(
+            summary = "Delete note",
+            description = "Deletes a note by its identifier.",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Note deleted"),
+                    @ApiResponse(responseCode = "404", description = "Note not found")
+            }
+    )
+    public void delete(@Parameter(description = "Note identifier") @PathVariable UUID noteId) {
         noteService.delete(noteId);
     }
 }
