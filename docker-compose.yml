@@ -44,11 +44,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
 
       # If you want to use the mounted changelog instead of classpath:
-      SPRING_LIQUIBASE_CHANGE_LOG: file:/app/db-changelog/changelog-master.sql
+      SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/changelog-master.sql
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-    volumes:
-      # Mount the *folder* to a folder (not to a file path)
-      - ./db-changelog:/app/db-changelog
     depends_on:
       postgres:
         condition: service_healthy
