@@ -30,7 +30,7 @@ jobs:
       compose-path: infra/docker-compose.yml
       remote-path: "/home/exeltan/task-management/docker-compose.yml"
     secrets:
-      SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       VPS_HOST: ${{ secrets.VPS_HOST }}
       VPS_USER: ${{ secrets.VPS_USER }}
 
