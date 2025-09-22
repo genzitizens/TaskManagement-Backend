@@ -27,7 +27,7 @@ jobs:
     needs: sonarcloud
     uses: genzitizens/ci-templates/.github/workflows/sync-compose-to-vps.yml@main
     with:
-      compose-path: infra/docker/docker-compose.yml
+      compose-path: infra/docker-compose.yml
       remote-path: "/home/exeltan/task-management/docker-compose.yml"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
