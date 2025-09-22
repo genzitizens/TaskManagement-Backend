@@ -2,7 +2,7 @@ name: Deploy Application
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   sonarcloud:
@@ -24,10 +24,10 @@ jobs:
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
 
   sync-compose:
-    needs : push-ghcr
-    uses:  genzitizens/ci-templates/.github/workflows/sync-compose-to-vps.yml@main
+    needs: sonarcloud
+    uses: genzitizens/ci-templates/.github/workflows/sync-compose-to-vps.yml@main
     with:
-      compose-path: infra/docker
+      compose-path: infra/docker/docker-compose.yml
       remote-path: "/home/exeltan/task-management/docker-compose.yml"
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
@@ -35,7 +35,7 @@ jobs:
       VPS_USER: ${{ secrets.VPS_USER }}
 
   deploy:
-    needs: sync-compose
+    needs: [ push-ghcr , sync-compose ]
     uses: genzitizens/ci-templates/.github/workflows/deploy-to-vps.yml@main
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -48,3 +48,4 @@ jobs:
     with:
       IMAGE_NAME: "task-management"
       COMPOSE_PATH: "/home/exeltan/task-management/docker-compose.yml"
+      RUN_COMPOSE_PULL: true
