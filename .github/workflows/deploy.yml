@@ -23,8 +23,19 @@ jobs:
       GHCR_ORG: ${{ secrets.GHCR_ORG }}
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
 
+  sync-compose:
+    needs : push-ghcr
+    uses:  genzitizens/ci-templates/.github/workflows/sync-compose-to-vps.yml@main
+    with:
+      compose-path: infra/docker
+      remote-path: "/home/exeltan/task-management/docker-compose.yml"
+    secrets:
+      SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+
   deploy:
-    needs: push-ghcr
+    needs: sync-compose
     uses: genzitizens/ci-templates/.github/workflows/deploy-to-vps.yml@main
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -34,7 +45,6 @@ jobs:
       GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       GHCR_ORG: ${{ secrets.GHCR_ORG }}
-
     with:
       IMAGE_NAME: "task-management"
       COMPOSE_PATH: "/home/exeltan/task-management/docker-compose.yml"

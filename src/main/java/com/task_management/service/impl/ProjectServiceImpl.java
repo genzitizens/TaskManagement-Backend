@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service @RequiredArgsConstructor @Transactional
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projects;
@@ -30,7 +32,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectRes get(java.util.UUID id) {
+    public ProjectRes get(UUID id) {
         return mapper.toRes(projects.findById(id)
                 .orElseThrow(() -> new NotFoundException("Project not found")));
     }
@@ -41,7 +43,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectRes update(java.util.UUID id, ProjectUpdateReq req) {
+    public ProjectRes update(UUID id, ProjectUpdateReq req) {
         var p = projects.findById(id).orElseThrow(() -> new NotFoundException("Project not found"));
         if (req.name() != null && !p.getName().equalsIgnoreCase(req.name())
                 && projects.existsByNameIgnoreCase(req.name()))
@@ -51,7 +53,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void delete(java.util.UUID id) {
+    public void delete(UUID id) {
         if (!projects.existsById(id)) throw new NotFoundException("Project not found");
         projects.deleteById(id);
     }

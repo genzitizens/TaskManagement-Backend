@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service @RequiredArgsConstructor @Transactional
 public class NoteServiceImpl implements NoteService {
     private final NoteRepository notes;
@@ -43,19 +45,19 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Page<NoteRes> listForProject(java.util.UUID projectId, Pageable pageable) {
+    public Page<NoteRes> listForProject(UUID projectId, Pageable pageable) {
         if (!projects.existsById(projectId)) throw new NotFoundException("Project not found");
         return notes.findByProjectIdOrderByCreatedAtDesc(projectId, pageable).map(mapper::toRes);
     }
 
     @Override
-    public Page<NoteRes> listForTask(java.util.UUID taskId, Pageable pageable) {
+    public Page<NoteRes> listForTask(UUID taskId, Pageable pageable) {
         if (!tasks.existsById(taskId)) throw new NotFoundException("Task not found");
         return notes.findByTaskIdOrderByCreatedAtDesc(taskId, pageable).map(mapper::toRes);
     }
 
     @Override
-    public void delete(java.util.UUID noteId) {
+    public void delete(UUID noteId) {
         if (!notes.existsById(noteId)) throw new NotFoundException("Note not found");
         notes.deleteById(noteId);
     }
