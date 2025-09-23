@@ -15,6 +15,7 @@ import com.task_management.entity.Task;
 import com.task_management.exception.BadRequestException;
 import com.task_management.exception.NotFoundException;
 import com.task_management.mapper.TaskMapper;
+import com.task_management.monitoring.TaskMetrics;
 import com.task_management.repository.ProjectRepository;
 import com.task_management.repository.TaskRepository;
 import java.time.Instant;
@@ -44,6 +45,9 @@ class TaskServiceImplTest {
 
     @Mock
     private TaskMapper taskMapper;
+
+    @Mock
+    private TaskMetrics taskMetrics;
 
     @InjectMocks
     private TaskServiceImpl taskService;
@@ -133,6 +137,7 @@ class TaskServiceImplTest {
         assertThat(saved.getDescription()).isEqualTo("Desc");
         assertThat(saved.isActivity()).isTrue();
         assertThat(saved.getEndAt()).isEqualTo(endAt);
+        verify(taskMetrics).incrementCreated();
     }
 
     @Test
@@ -236,6 +241,7 @@ class TaskServiceImplTest {
         assertThat(task.getDescription()).isEqualTo("New Desc");
         assertThat(task.isActivity()).isFalse();
         assertThat(task.getEndAt()).isEqualTo(Instant.parse("2024-03-01T00:00:00Z"));
+        verify(taskMetrics).incrementUpdated();
     }
 
     @Test
@@ -258,5 +264,6 @@ class TaskServiceImplTest {
         taskService.delete(taskId);
 
         verify(taskRepository).deleteById(taskId);
+        verify(taskMetrics).incrementDeleted();
     }
 }
