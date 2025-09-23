@@ -6,8 +6,11 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint;
+import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusScrapeEndpoint.PrometheusOutputFormat;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,7 +39,7 @@ class ActuatorIntegrationTest {
 
     @Test
     void prometheusRegistryExportsCustomCounter() {
-        String scrape = prometheusScrapeEndpoint.scrape();
+        String scrape = prometheusScrapeEndpoint.scrape(PrometheusOutputFormat.TEXT, Set.of());
         assertTrue(scrape.contains("task_management_tasks_created_total"));
     }
 }
