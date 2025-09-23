@@ -45,6 +45,9 @@ services:
       SPRING_DATASOURCE_USERNAME: username
       SPRING_DATASOURCE_PASSWORD: password
 
+      # Logging
+      LOGGING_FILE_NAME: /var/log/task-management/app.log
+
       # If you want to use the mounted changelog instead of classpath:
       SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/changelog-master.sql
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
