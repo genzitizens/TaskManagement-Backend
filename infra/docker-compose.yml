@@ -30,6 +30,9 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
 
+      # Logging
+      LOGGING_FILE_NAME: /var/log/task-management/app.log
+
       # Liquibase
       SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/changelog-master.sql
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate

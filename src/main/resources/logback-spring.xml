@@ -4,7 +4,7 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <springProperty scope="context" name="APP_LOG_FILE" source="logging.file.name"
-                    defaultValue="/var/log/task-management/app.log"/>
+                    defaultValue="logs/app.log"/>
     <springProperty scope="context" name="APP_NAME" source="spring.application.name"
                     defaultValue="task-management"/>
 
