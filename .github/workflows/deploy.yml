@@ -24,7 +24,7 @@ jobs:
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
 
   sync-compose:
-    needs: sonarcloud
+    needs: push-ghcr
     uses: genzitizens/ci-templates/.github/workflows/sync-compose-to-vps.yml@main
     with:
       compose-path: infra/docker-compose.yml
@@ -35,7 +35,7 @@ jobs:
       VPS_USER: ${{ secrets.VPS_USER }}
 
   deploy:
-    needs: [ push-ghcr , sync-compose ]
+    needs: sync-compose
     uses: genzitizens/ci-templates/.github/workflows/deploy-to-vps.yml@main
     secrets:
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
