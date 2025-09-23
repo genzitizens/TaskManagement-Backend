@@ -4,9 +4,9 @@ This service provides project, task and note management APIs built with Spring B
 
 ## Logging and observability
 
-- Logback writes structured JSON logs to `/var/log/task-management/app.log` inside the container while keeping the colourised console output for local debugging.
-- Both Docker Compose definitions bind mount the repository's `logs/` directory to that path (`./logs` in the root compose file and `../logs` in `infra/docker-compose.yml`), so the host gets a rolling set of files such as `logs/app.log` and `logs/app.log.2024-05-20.0.gz`.
-- Override the location by setting the `LOGGING_FILE_NAME` environment variable if you need a different target path.
+- By default Logback writes structured JSON logs to `logs/app.log` (relative to the working directory) while keeping the colourised console output for local debugging.
+- Override the location by setting the `LOGGING_FILE_NAME` environment variable if you need a different target path (for example `/var/log/task-management/app.log`). Be sure that the chosen directory already exists and is writable by the process owner before starting the application.
+- Both Docker Compose definitions bind mount the repository's `logs/` directory to `/app/logs` (which keeps the default `logs/app.log` target inside the container), so the host gets a rolling set of files such as `logs/app.log` and `logs/app.log.2024-05-20.0.gz`.
 
 ### Scraping the logs with Promtail
 
