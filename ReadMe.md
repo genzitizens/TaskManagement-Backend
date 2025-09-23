@@ -32,3 +32,5 @@ Interactive OpenAPI documentation is available once the application is running (
 - OpenAPI JSON: [http://localhost:8002/v3/api-docs](http://localhost:8002/v3/api-docs)
 
 The documentation is generated automatically from controller annotations using Springdoc.
+
+
