@@ -1,66 +1,65 @@
 services:
   postgres:
     image: postgres:15
-    container_name: taskDB
+    container_name: taskdb
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: TaskDB
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5433:5432"  # host:container (container stays 5432)
+      - "${POSTGRES_PORT}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     networks:
       - shared_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U username -d TaskDB -p 5432"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p 5432"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: always
 
-  dbgate:
-    image: dbgate/dbgate:latest
-    container_name: taskDB-dbGate
-    ports:
-      - "3000:3000"
-    networks:
-      - shared_network
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   springboot-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/genzitizens/task-management:latest
     container_name: task-management-service
     volumes:
-      - ./logs:/app/logs
-    ports:
-      - "8002:8002"
+      - ../task-management-logs:/app/logs
     environment:
-      # Containers talk to the postgres *service name* on its container port 5432
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/TaskDB
-      SPRING_DATASOURCE_USERNAME: username
-      SPRING_DATASOURCE_PASSWORD: password
+      # DB
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${SPRING_DATASOURCE_DB}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
 
       # Logging
-      LOGGING_FILE_NAME: /var/log/task-management/app.log
+      LOGGING_FILE_NAME: /app/logs/app.log
 
-      # If you want to use the mounted changelog instead of classpath:
+      # Liquibase
       SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/changelog-master.sql
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+
+      # App port
+      SERVER_PORT: ${SPRING_SERVER_PORT}
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.task-management.rule=Host(`${SPRING_SERVER_URL}`)"
+      - "traefik.http.routers.task-management.entrypoints=websecure"
+      - "traefik.http.routers.task-management.tls=true"
+      - "traefik.http.routers.task-management.tls.certresolver=myresolver"
+      - "traefik.http.services.task-management.loadbalancer.server.port=${SPRING_SERVER_PORT}"
+    networks:
+      - shared_network
     depends_on:
       postgres:
         condition: service_healthy
-    networks:
-      - shared_network
+    ports:
+      - "${SPRING_SERVER_PORT}:${SPRING_SERVER_PORT}"
     restart: always
 
 volumes:
-  postgres_data:
+  pgdata:
 
 networks:
   shared_network:
     external: true
+
