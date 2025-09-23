@@ -35,6 +35,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: task-management-service
+    volumes:
+      - ./logs:/var/log/task-management
     ports:
       - "8002:8002"
     environment:

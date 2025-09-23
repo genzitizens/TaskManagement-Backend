@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <springProperty scope="context" name="APP_LOG_FILE" source="logging.file.name"
+                    defaultValue="/var/log/task-management/app.log"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name"
+                    defaultValue="task-management"/>
+
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${APP_LOG_FILE}</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${APP_LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service_name":"${APP_NAME}"}</customFields>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="JSON_FILE"/>
+    </root>
+</configuration>
