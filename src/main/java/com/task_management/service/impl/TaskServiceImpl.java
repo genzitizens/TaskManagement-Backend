@@ -7,6 +7,7 @@ import com.task_management.entity.Task;
 import com.task_management.exception.BadRequestException;
 import com.task_management.exception.NotFoundException;
 import com.task_management.mapper.TaskMapper;
+import com.task_management.monitoring.TaskMetrics;
 import com.task_management.repository.ProjectRepository;
 import com.task_management.repository.TaskRepository;
 import com.task_management.service.TaskService;
@@ -21,6 +22,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository tasks;
     private final ProjectRepository projects;
     private final TaskMapper mapper;
+    private final TaskMetrics metrics;
 
     @Override
     public TaskRes create(TaskCreateReq req) {
@@ -36,7 +38,9 @@ public class TaskServiceImpl implements TaskService {
         t.setActivity(req.isActivity());
         t.setEndAt(req.endAt());
 
-        return mapper.toRes(tasks.save(t));
+        var savedTask = tasks.save(t);
+        metrics.incrementCreated();
+        return mapper.toRes(savedTask);
     }
 
     @Override
@@ -62,12 +66,15 @@ public class TaskServiceImpl implements TaskService {
         if (req.isActivity() != null) t.setActivity(req.isActivity());
         if (req.endAt() != null) t.setEndAt(req.endAt());
         if (t.getEndAt() == null) throw new BadRequestException("endAt is required");
-        return mapper.toRes(tasks.save(t));
+        var updatedTask = tasks.save(t);
+        metrics.incrementUpdated();
+        return mapper.toRes(updatedTask);
     }
 
     @Override
     public void delete(java.util.UUID id) {
         if (!tasks.existsById(id)) throw new NotFoundException("Task not found");
         tasks.deleteById(id);
+        metrics.incrementDeleted();
     }
 }
