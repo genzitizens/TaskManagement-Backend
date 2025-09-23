@@ -23,7 +23,7 @@ services:
     image: ghcr.io/genzitizens/task-management:latest
     container_name: task-management-service
     volumes:
-      - ../logs:/var/log/task-management
+      - ../logs:/app/logs
     environment:
       # DB
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${SPRING_DATASOURCE_DB}
