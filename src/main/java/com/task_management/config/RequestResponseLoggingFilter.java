@@ -21,6 +21,8 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestResponseLoggingFilter.class);
     private static final int MAX_PAYLOAD_LENGTH = 2000;
+    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    private static final String TRUNCATION_SUFFIX = "...(truncated)";
 
     @Override
     protected void doFilterInternal(
@@ -102,7 +104,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
             return "<binary or large payload omitted>";
         }
 
-        Charset charset = StandardCharsets.UTF_8;
+        Charset charset = DEFAULT_CHARSET;
         if (encoding != null && !encoding.isBlank()) {
             try {
                 charset = Charset.forName(encoding);
@@ -112,7 +114,7 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
         }
         String payload = new String(buf, charset);
         if (payload.length() > MAX_PAYLOAD_LENGTH) {
-            return payload.substring(0, MAX_PAYLOAD_LENGTH) + "...(truncated)";
+            return payload.substring(0, MAX_PAYLOAD_LENGTH) + TRUNCATION_SUFFIX;
         }
         return payload;
     }
