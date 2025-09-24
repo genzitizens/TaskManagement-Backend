@@ -23,7 +23,7 @@ services:
     image: ghcr.io/genzitizens/task-management:latest
     container_name: task-management-service
     volumes:
-      - ../logs:/app/logs
+      - ../task-management-logs:/app/logs
     environment:
       # DB
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${SPRING_DATASOURCE_DB}
@@ -31,7 +31,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
 
       # Logging
-      LOGGING_FILE_NAME: /var/log/task-management/app.log
+      LOGGING_FILE_NAME: /app/logs/app.log
 
       # Liquibase
       SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/changelog-master.sql
