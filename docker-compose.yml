@@ -3,63 +3,55 @@ services:
     image: postgres:15
     container_name: taskdb
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: TaskDB
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5433:5432"  # host:container (container stays 5432)
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - shared_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -p 5432"]
+      test: [ "CMD-SHELL", "pg_isready -U username -d TaskDB -p 5432" ]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: always
 
-  springboot-app:
-    image: ghcr.io/genzitizens/task-management:latest
-    container_name: task-management-service
-    volumes:
-      - ../task-management-logs:/app/logs
-    environment:
-      # DB
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${SPRING_DATASOURCE_DB}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-
-      # Logging
-      LOGGING_FILE_NAME: /app/logs/app.log
-
-      # Liquibase
-      SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/changelog-master.sql
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-
-      # App port
-      SERVER_PORT: ${SPRING_SERVER_PORT}
-
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.task-management.rule=Host(`${SPRING_SERVER_URL}`)"
-      - "traefik.http.routers.task-management.entrypoints=websecure"
-      - "traefik.http.routers.task-management.tls=true"
-      - "traefik.http.routers.task-management.tls.certresolver=myresolver"
-      - "traefik.http.services.task-management.loadbalancer.server.port=${SPRING_SERVER_PORT}"
+  dbgate:
+    image: dbgate/dbgate:latest
+    ports:
+      - "3000:3000"
     networks:
-      - shared_network
+    - shared_network
+    depends_on:
+        postgres:
+          condition: service_healthy
+
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: notesService
+    ports:
+      - "8002:8002"
+    environment:
+      # Containers talk to the postgres *service name* on its container port 5432
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/TaskDB
+      SPRING_DATASOURCE_USERNAME: username
+      SPRING_DATASOURCE_PASSWORD: password
+
     depends_on:
       postgres:
         condition: service_healthy
-    ports:
-      - "${SPRING_SERVER_PORT}:${SPRING_SERVER_PORT}"
+    networks:
+      - shared_network
     restart: always
 
 volumes:
-  pgdata:
+  postgres_data:
 
 networks:
   shared_network:
-    external: true
-
+      external: true
