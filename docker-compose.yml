@@ -36,7 +36,12 @@ services:
     container_name: notesService
     ports:
       - "8002:8002"
+    volumes:
+    - ../task-management-logs:/app/logs
     environment:
+      # Logging
+      LOGGING_FILE_NAME: /app/logs/app.log
+
       # Containers talk to the postgres *service name* on its container port 5432
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/TaskDB
       SPRING_DATASOURCE_USERNAME: username
