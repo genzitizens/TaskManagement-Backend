@@ -32,3 +32,8 @@ Interactive OpenAPI documentation is available once the application is running (
 - OpenAPI JSON: [http://localhost:8002/v3/api-docs](http://localhost:8002/v3/api-docs)
 
 The documentation is generated automatically from controller annotations using Springdoc.
+
+## Client interaction diagrams
+
+Detailed Mermaid sequence and flow diagrams showing how clients interact with the API live in [docs/client-interaction.md](docs/client-interaction.md). They outline the validation, service orchestration, persistence, and error handling steps for typical requests.
+
