@@ -29,7 +29,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A[Client request\n(REST over HTTPS)] --> B{Is request valid?}
+    A[Client request] --> B{Is request valid?}
     B -- No --> E[Return 400 Bad Request\nwith error details]
     B -- Yes --> C[Controller invokes service layer]
     C --> D{Business rules satisfied?}
@@ -40,7 +40,7 @@ flowchart TD
     I --> J[Repository maps entity]
     J --> K[Service maps entity to DTO]
     K --> L[Controller builds HTTP response]
-    L --> M[Client receives JSON payload\n(e.g. created task details)]
+    L --> M[Client receives JSON payload]
 ```
 
 Both diagrams reflect the same happy-path and error handling behaviour that is implemented in the controllers, services, and repositories within this project.
