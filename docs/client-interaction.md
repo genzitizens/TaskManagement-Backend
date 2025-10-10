@@ -30,11 +30,11 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A[Client request] --> B{Is request valid?}
-    B -- No --> E[Return 400 Bad Request\nwith error details]
+    B -- No --> E[Return 400 Bad Requestwith error details]
     B -- Yes --> C[Controller invokes service layer]
     C --> D{Business rules satisfied?}
-    D -- No --> F[Throw domain exception\nhandled by RestExceptionHandler]
-    F --> G[Return 4xx/5xx response\nwith structured error body]
+    D -- No --> F[Throw domain exception handled by RestExceptionHandler]
+    F --> G[Return 4xx/5xx response with structured error body]
     D -- Yes --> H[Repository performs JPA call]
     H --> I[Database stores/fetches data]
     I --> J[Repository maps entity]
