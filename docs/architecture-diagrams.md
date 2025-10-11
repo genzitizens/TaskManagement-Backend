@@ -8,9 +8,9 @@ This diagram shows how the Spring Boot service interacts with downstream systems
 
 ```mermaid
 graph TD
-    Client["API Consumers\n(Web, Mobile, Integrations)"] -->|"REST over HTTP"| ApiService["Task Management API\n(Spring Boot)"]
+    Client["API Consumers(Web, Mobile, Integrations)"] -->|"REST over HTTP"| ApiService["Task Management API(Spring Boot)"]
     ApiService -->|"CRUD via Spring Data JPA"| Postgres[("PostgreSQL\nTaskDB")]
-    ApiService -->|"Schema managed by"| Liquibase["Liquibase Changelog\n(db/changelog)"]
+    ApiService -->|"Schema managed by"| Liquibase["Liquibase Changelog(db/changelog)"]
     ApiService -->|"Structured logs (Logback)"| LogFile["logs/app.log"]
     LogFile -->|"Tailed by"| Promtail["Promtail Agent"]
     Promtail --> Loki[("Loki Log Store")]
@@ -24,11 +24,11 @@ The layered architecture within the application separates HTTP concerns, domain 
 ```mermaid
 flowchart TD
     subgraph WebLayer[Web Layer]
-        Controllers["REST Controllers\n(Project/Task/Note)"]
+        Controllers["REST Controllers(Project/Task/Note)"]
     end
     subgraph ServiceLayer[Service Layer]
-        Services["Services\n(Project/Task/Note)"]
-        Metrics["TaskMetrics\n(Micrometer counters)"]
+        Services["Services(Project/Task/Note)"]
+        Metrics["TaskMetrics(Micrometer counters)"]
     end
     subgraph PersistenceLayer[Persistence Layer]
         Mappers["MapStruct Mappers"]
@@ -87,11 +87,11 @@ The default Docker Compose stack wires the service to PostgreSQL with optional a
 ```mermaid
 flowchart LR
     subgraph SharedNetwork[shared_network]
-        SpringBoot["springboot-app\n(Task Management API)"]
-        Postgres["postgres\n(PostgreSQL 15)"]
-        Dbgate["dbgate\n(SQL Admin UI)"]
+        SpringBoot["springboot-app(Task Management API)"]
+        Postgres["postgres(PostgreSQL 15)"]
+        Dbgate["dbgate(SQL Admin UI)"]
     end
     Postgres ---|"5432"| SpringBoot
     Dbgate ---|"HTTP 3000"| Postgres
-    Volume[("../task-management-logs\n(host volume)")] --> SpringBoot
+    Volume[("../task-management-logs(host volume)")] --> SpringBoot
 ```
