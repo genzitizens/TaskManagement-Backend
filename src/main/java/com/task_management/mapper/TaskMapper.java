@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface TaskMapper {
-    @Mapping(target="projectId", source="project.id")
+    @Mapping(target = "projectId", source = "project.id")
+    @Mapping(target = "isActivity", source = "activity")
     TaskRes toRes(Task entity);
 }
