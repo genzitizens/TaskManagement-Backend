@@ -66,7 +66,8 @@ class TaskControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(response.id().toString()))
-                .andExpect(jsonPath("$.projectId").value(projectId.toString()));
+                .andExpect(jsonPath("$.projectId").value(projectId.toString()))
+                .andExpect(jsonPath("$.isActivity").value(true));
 
         ArgumentCaptor<TaskCreateReq> captor = ArgumentCaptor.forClass(TaskCreateReq.class);
         verify(taskService).create(captor.capture());
@@ -91,7 +92,8 @@ class TaskControllerTest {
         mockMvc.perform(get("/api/tasks/{id}", taskId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(taskId.toString()))
-                .andExpect(jsonPath("$.title").value("Title"));
+                .andExpect(jsonPath("$.title").value("Title"))
+                .andExpect(jsonPath("$.isActivity").value(false));
 
         verify(taskService).get(taskId);
     }
@@ -115,7 +117,8 @@ class TaskControllerTest {
 
         mockMvc.perform(get("/api/tasks").param("projectId", projectId.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].projectId").value(projectId.toString()));
+                .andExpect(jsonPath("$.content[0].projectId").value(projectId.toString()))
+                .andExpect(jsonPath("$.content[0].isActivity").value(false));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
@@ -146,7 +149,8 @@ class TaskControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(taskId.toString()))
-                .andExpect(jsonPath("$.title").value("Updated"));
+                .andExpect(jsonPath("$.title").value("Updated"))
+                .andExpect(jsonPath("$.isActivity").value(false));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<TaskUpdateReq> reqCaptor = ArgumentCaptor.forClass(TaskUpdateReq.class);
