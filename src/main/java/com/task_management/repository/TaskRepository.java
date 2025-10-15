@@ -21,7 +21,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       """)
     Page<Task> searchInProject(@Param("projectId") UUID projectId, @Param("q") String q, Pageable pageable);
 
-    @Query("select count(t) from Task t where t.project.id = :projectId and t.isActivity = true")
+    @Query("select count(t) from Task t where t.project.id = :projectId and t.activity = true")
     long countActivities(@Param("projectId") UUID projectId);
 
     boolean existsByIdAndProjectId(UUID taskId, UUID projectId);

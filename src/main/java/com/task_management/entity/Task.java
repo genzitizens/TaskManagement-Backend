@@ -39,7 +39,7 @@ public class Task {
     private String description;
 
     @Column(name = "is_activity", nullable = false)
-    private boolean isActivity;
+    private boolean activity;
 
     /** required end date/time per requirements */
     @Column(name = "end_at", nullable = false)
