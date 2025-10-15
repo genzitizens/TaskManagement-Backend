@@ -35,7 +35,7 @@ public class TaskServiceImpl implements TaskService {
         t.setTitle(req.title().trim());
         if (t.getTitle().isBlank()) throw new BadRequestException("Task title required");
         t.setDescription(req.description());
-        t.setActivity(req.isActivity());
+        t.setActivity(req.activity());
         t.setEndAt(req.endAt());
 
         var savedTask = tasks.save(t);
@@ -63,7 +63,7 @@ public class TaskServiceImpl implements TaskService {
             t.setTitle(v);
         }
         if (req.description() != null) t.setDescription(req.description());
-        if (req.isActivity() != null) t.setActivity(req.isActivity());
+        if (req.activity() != null) t.setActivity(req.activity());
         if (req.endAt() != null) t.setEndAt(req.endAt());
         if (t.getEndAt() == null) throw new BadRequestException("endAt is required");
         var updatedTask = tasks.save(t);

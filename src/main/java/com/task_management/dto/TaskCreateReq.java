@@ -12,7 +12,7 @@ public record TaskCreateReq(
         @NotNull UUID projectId,
         @NotBlank @Size(max = 160) String title,
         @Size(max = 10_000) String description,
-        @JsonProperty("isActivity") boolean isActivity,
+        @JsonProperty("isActivity") boolean activity,
         @NotNull Instant endAt
 ) {
 }

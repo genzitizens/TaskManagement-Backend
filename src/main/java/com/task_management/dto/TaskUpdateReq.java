@@ -10,7 +10,7 @@ import java.time.Instant;
 public record TaskUpdateReq(
         @Size(max = 160) String title,
         String description,
-        @JsonProperty("isActivity") Boolean isActivity,
+        @JsonProperty("isActivity") Boolean activity,
         Instant endAt
 ) {
 }

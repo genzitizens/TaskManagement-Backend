@@ -31,7 +31,7 @@ class TaskDtoJsonTest {
         assertThat(json).contains("\"isActivity\":true");
 
         TaskRes roundTrip = mapper.readValue(json, TaskRes.class);
-        assertThat(roundTrip.isActivity()).isTrue();
+        assertThat(roundTrip.activity()).isTrue();
     }
 
     @Test
@@ -48,7 +48,7 @@ class TaskDtoJsonTest {
 
         TaskCreateReq req = mapper.readValue(json, TaskCreateReq.class);
 
-        assertThat(req.isActivity()).isTrue();
+        assertThat(req.activity()).isTrue();
     }
 
     @Test
@@ -62,6 +62,6 @@ class TaskDtoJsonTest {
 
         TaskUpdateReq req = mapper.readValue(json, TaskUpdateReq.class);
 
-        assertThat(req.isActivity()).isFalse();
+        assertThat(req.activity()).isFalse();
     }
 }

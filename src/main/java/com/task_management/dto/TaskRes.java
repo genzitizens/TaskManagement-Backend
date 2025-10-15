@@ -9,7 +9,7 @@ public record TaskRes(
         UUID projectId,
         String title,
         String description,
-        @JsonProperty("isActivity") boolean isActivity,
+        @JsonProperty("isActivity") boolean activity,
         Instant endAt,
         Instant createdAt,
         Instant updatedAt

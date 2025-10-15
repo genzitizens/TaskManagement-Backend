@@ -32,6 +32,6 @@ class TaskMapperTest {
         var res = mapper.toRes(task);
 
         assertThat(res.projectId()).isEqualTo(projectId);
-        assertThat(res.isActivity()).isTrue();
+        assertThat(res.activity()).isTrue();
     }
 }
