@@ -57,6 +57,7 @@ class TaskRepositoryIntegrationTest {
         task.setTitle(activity ? "Active" : "Passive");
         task.setDescription("desc");
         task.setActivity(activity);
+        task.setDuration(activity ? 60 : 30);
         task.setEndAt(Instant.parse("2024-01-01T00:00:00Z"));
         return task;
     }

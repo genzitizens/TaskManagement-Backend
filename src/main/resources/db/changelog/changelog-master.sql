@@ -51,3 +51,14 @@ CREATE INDEX idx_note_project ON note (project_id);
 CREATE INDEX idx_note_task ON note (task_id);
 
 --rollback DROP TABLE note;
+
+--changeset openai:004-add-task-duration
+ALTER TABLE task
+    ADD COLUMN duration INTEGER NOT NULL DEFAULT 0;
+
+UPDATE task SET duration = 0 WHERE duration IS NULL;
+
+ALTER TABLE task
+    ALTER COLUMN duration DROP DEFAULT;
+
+--rollback ALTER TABLE task DROP COLUMN duration;

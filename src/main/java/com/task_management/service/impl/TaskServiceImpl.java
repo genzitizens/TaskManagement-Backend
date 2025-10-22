@@ -36,6 +36,7 @@ public class TaskServiceImpl implements TaskService {
         if (t.getTitle().isBlank()) throw new BadRequestException("Task title required");
         t.setDescription(req.description());
         t.setActivity(req.activity());
+        t.setDuration(req.duration());
         t.setEndAt(req.endAt());
 
         var savedTask = tasks.save(t);
@@ -64,8 +65,10 @@ public class TaskServiceImpl implements TaskService {
         }
         if (req.description() != null) t.setDescription(req.description());
         if (req.activity() != null) t.setActivity(req.activity());
+        if (req.duration() != null) t.setDuration(req.duration());
         if (req.endAt() != null) t.setEndAt(req.endAt());
         if (t.getEndAt() == null) throw new BadRequestException("endAt is required");
+        if (t.getDuration() == null) throw new BadRequestException("duration is required");
         var updatedTask = tasks.save(t);
         metrics.incrementUpdated();
         return mapper.toRes(updatedTask);

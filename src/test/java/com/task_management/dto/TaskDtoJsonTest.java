@@ -21,6 +21,7 @@ class TaskDtoJsonTest {
                 "Title",
                 "Desc",
                 true,
+                15,
                 now,
                 now,
                 now
@@ -42,6 +43,7 @@ class TaskDtoJsonTest {
                   "title": "Example",
                   "description": "Details",
                   "isActivity": true,
+                  "duration": 45,
                   "endAt": "2024-01-01T00:00:00Z"
                 }
                 """;
@@ -49,6 +51,7 @@ class TaskDtoJsonTest {
         TaskCreateReq req = mapper.readValue(json, TaskCreateReq.class);
 
         assertThat(req.activity()).isTrue();
+        assertThat(req.duration()).isEqualTo(45);
     }
 
     @Test
@@ -56,12 +59,14 @@ class TaskDtoJsonTest {
         String json = """
                 {
                   "title": "Example",
-                  "isActivity": false
+                  "isActivity": false,
+                  "duration": 10
                 }
                 """;
 
         TaskUpdateReq req = mapper.readValue(json, TaskUpdateReq.class);
 
         assertThat(req.activity()).isFalse();
+        assertThat(req.duration()).isEqualTo(10);
     }
 }
