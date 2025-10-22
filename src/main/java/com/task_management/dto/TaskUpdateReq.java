@@ -11,6 +11,7 @@ public record TaskUpdateReq(
         @Size(max = 160) String title,
         String description,
         @JsonProperty("isActivity") Boolean activity,
+        Integer duration,
         Instant endAt
 ) {
 }

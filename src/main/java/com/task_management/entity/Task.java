@@ -41,6 +41,9 @@ public class Task {
     @Column(name = "is_activity", nullable = false)
     private boolean activity;
 
+    @Column(name = "duration", nullable = false)
+    private Integer duration;
+
     /** required end date/time per requirements */
     @Column(name = "end_at", nullable = false)
     private Instant endAt;

@@ -13,6 +13,7 @@ public record TaskCreateReq(
         @NotBlank @Size(max = 160) String title,
         @Size(max = 10_000) String description,
         @JsonProperty("isActivity") boolean activity,
+        @NotNull Integer duration,
         @NotNull Instant endAt
 ) {
 }
