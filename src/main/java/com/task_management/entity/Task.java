@@ -16,6 +16,7 @@ import java.util.UUID;
         name = "task",
         indexes = {
                 @Index(name = "idx_task_project", columnList = "project_id"),
+                @Index(name = "idx_task_start_at", columnList = "start_at"),
                 @Index(name = "idx_task_end_at", columnList = "end_at")
         }
 )
@@ -43,6 +44,9 @@ public class Task {
 
     @Column(name = "duration", nullable = false)
     private Integer duration;
+
+    @Column(name = "start_at", nullable = false)
+    private Instant startAt;
 
     /** required end date/time per requirements */
     @Column(name = "end_at", nullable = false)

@@ -11,6 +11,7 @@ public record TaskRes(
         String description,
         @JsonProperty("isActivity") boolean activity,
         Integer duration,
+        Instant startAt,
         Instant endAt,
         Instant createdAt,
         Instant updatedAt

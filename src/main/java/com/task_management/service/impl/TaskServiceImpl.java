@@ -28,6 +28,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskRes create(TaskCreateReq req) {
         var project = projects.findById(req.projectId())
                 .orElseThrow(() -> new NotFoundException("Project not found"));
+        if (req.startAt() == null) throw new BadRequestException("startAt is required");
         if (req.endAt() == null) throw new BadRequestException("endAt is required");
 
         var t = new Task();
@@ -37,6 +38,7 @@ public class TaskServiceImpl implements TaskService {
         t.setDescription(req.description());
         t.setActivity(req.activity());
         t.setDuration(req.duration());
+        t.setStartAt(req.startAt());
         t.setEndAt(req.endAt());
 
         var savedTask = tasks.save(t);
@@ -66,7 +68,9 @@ public class TaskServiceImpl implements TaskService {
         if (req.description() != null) t.setDescription(req.description());
         if (req.activity() != null) t.setActivity(req.activity());
         if (req.duration() != null) t.setDuration(req.duration());
+        if (req.startAt() != null) t.setStartAt(req.startAt());
         if (req.endAt() != null) t.setEndAt(req.endAt());
+        if (t.getStartAt() == null) throw new BadRequestException("startAt is required");
         if (t.getEndAt() == null) throw new BadRequestException("endAt is required");
         if (t.getDuration() == null) throw new BadRequestException("duration is required");
         var updatedTask = tasks.save(t);
