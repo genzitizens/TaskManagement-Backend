@@ -14,6 +14,7 @@ public record TaskCreateReq(
         @Size(max = 10_000) String description,
         @JsonProperty("isActivity") boolean activity,
         @NotNull Integer duration,
+        @NotNull Instant startAt,
         @NotNull Instant endAt
 ) {
 }

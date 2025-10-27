@@ -69,6 +69,7 @@ class TaskServiceImplTest {
         task.setDescription("Description");
         task.setActivity(true);
         task.setDuration(60);
+        task.setStartAt(Instant.parse("2024-01-09T12:00:00Z"));
         task.setEndAt(Instant.parse("2024-01-10T12:00:00Z"));
 
         taskRes = new TaskRes(
@@ -78,6 +79,7 @@ class TaskServiceImplTest {
                 task.getDescription(),
                 task.isActivity(),
                 task.getDuration(),
+                task.getStartAt(),
                 task.getEndAt(),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
@@ -87,7 +89,7 @@ class TaskServiceImplTest {
     @Test
     void create_whenProjectMissing_throwsNotFound() {
         UUID projectId = UUID.randomUUID();
-        TaskCreateReq request = new TaskCreateReq(projectId, "Title", null, false, 30, Instant.now());
+        TaskCreateReq request = new TaskCreateReq(projectId, "Title", null, false, 30, Instant.now(), Instant.now());
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
@@ -98,7 +100,7 @@ class TaskServiceImplTest {
     @Test
     void create_whenEndAtMissing_throwsBadRequest() {
         UUID projectId = project.getId();
-        TaskCreateReq request = new TaskCreateReq(projectId, "Title", null, false, 30, null);
+        TaskCreateReq request = new TaskCreateReq(projectId, "Title", null, false, 30, Instant.now(), null);
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         assertThatExceptionOfType(BadRequestException.class)
@@ -109,9 +111,22 @@ class TaskServiceImplTest {
     }
 
     @Test
+    void create_whenStartAtMissing_throwsBadRequest() {
+        UUID projectId = project.getId();
+        TaskCreateReq request = new TaskCreateReq(projectId, "Title", null, false, 30, null, Instant.now());
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        assertThatExceptionOfType(BadRequestException.class)
+                .isThrownBy(() -> taskService.create(request))
+                .withMessage("startAt is required");
+
+        verify(taskRepository, never()).save(any());
+    }
+
+    @Test
     void create_whenTitleBlankAfterTrim_throwsBadRequest() {
         UUID projectId = project.getId();
-        TaskCreateReq request = new TaskCreateReq(projectId, "   ", null, false, 30, Instant.now());
+        TaskCreateReq request = new TaskCreateReq(projectId, "   ", null, false, 30, Instant.now(), Instant.now());
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         assertThatExceptionOfType(BadRequestException.class)
@@ -122,8 +137,9 @@ class TaskServiceImplTest {
     @Test
     void create_whenValid_savesTask() {
         UUID projectId = project.getId();
+        Instant startAt = Instant.parse("2024-01-01T00:00:00Z");
         Instant endAt = Instant.parse("2024-02-01T00:00:00Z");
-        TaskCreateReq request = new TaskCreateReq(projectId, "  Important Task  ", "Desc", true, 30, endAt);
+        TaskCreateReq request = new TaskCreateReq(projectId, "  Important Task  ", "Desc", true, 30, startAt, endAt);
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(taskRepository.save(any(Task.class))).thenReturn(task);
         when(taskMapper.toRes(task)).thenReturn(taskRes);
@@ -139,6 +155,7 @@ class TaskServiceImplTest {
         assertThat(saved.getDescription()).isEqualTo("Desc");
         assertThat(saved.isActivity()).isTrue();
         assertThat(saved.getDuration()).isEqualTo(30);
+        assertThat(saved.getStartAt()).isEqualTo(startAt);
         assertThat(saved.getEndAt()).isEqualTo(endAt);
         verify(taskMetrics).incrementCreated();
     }
@@ -195,7 +212,7 @@ class TaskServiceImplTest {
         when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> taskService.update(taskId, new TaskUpdateReq(null, null, null, null, null)))
+                .isThrownBy(() -> taskService.update(taskId, new TaskUpdateReq(null, null, null, null, null, null)))
                 .withMessage("Task not found");
     }
 
@@ -205,7 +222,7 @@ class TaskServiceImplTest {
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> taskService.update(taskId, new TaskUpdateReq("   ", null, null, null, null)))
+                .isThrownBy(() -> taskService.update(taskId, new TaskUpdateReq("   ", null, null, null, null, null)))
                 .withMessage("Task title cannot be blank");
     }
 
@@ -218,13 +235,35 @@ class TaskServiceImplTest {
         existing.setDescription("Desc");
         existing.setActivity(true);
         existing.setDuration(10);
+        existing.setStartAt(Instant.parse("2024-01-01T00:00:00Z"));
         existing.setEndAt(null);
         UUID taskId = existing.getId();
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(existing));
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> taskService.update(taskId, new TaskUpdateReq(null, null, null, null, null)))
+                .isThrownBy(() -> taskService.update(taskId, new TaskUpdateReq(null, null, null, null, null, null)))
                 .withMessage("endAt is required");
+
+        verify(taskRepository, never()).save(any());
+    }
+
+    @Test
+    void update_whenStartAtMissingAfterUpdate_throwsBadRequest() {
+        Task existing = new Task();
+        existing.setId(UUID.randomUUID());
+        existing.setProject(project);
+        existing.setTitle("Existing");
+        existing.setDescription("Desc");
+        existing.setActivity(true);
+        existing.setDuration(10);
+        existing.setStartAt(null);
+        existing.setEndAt(Instant.parse("2024-01-10T00:00:00Z"));
+        UUID taskId = existing.getId();
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(existing));
+
+        assertThatExceptionOfType(BadRequestException.class)
+                .isThrownBy(() -> taskService.update(taskId, new TaskUpdateReq(null, null, null, null, null, null)))
+                .withMessage("startAt is required");
 
         verify(taskRepository, never()).save(any());
     }
@@ -232,7 +271,8 @@ class TaskServiceImplTest {
     @Test
     void update_whenValid_updatesEntityAndReturnsResponse() {
         UUID taskId = task.getId();
-        TaskUpdateReq request = new TaskUpdateReq("  Updated Title  ", "New Desc", false, 45, Instant.parse("2024-03-01T00:00:00Z"));
+        TaskUpdateReq request = new TaskUpdateReq("  Updated Title  ", "New Desc", false, 45,
+                Instant.parse("2024-02-01T00:00:00Z"), Instant.parse("2024-03-01T00:00:00Z"));
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
         when(taskRepository.save(task)).thenReturn(task);
         when(taskMapper.toRes(task)).thenReturn(taskRes);
@@ -245,6 +285,7 @@ class TaskServiceImplTest {
         assertThat(task.getDescription()).isEqualTo("New Desc");
         assertThat(task.isActivity()).isFalse();
         assertThat(task.getDuration()).isEqualTo(45);
+        assertThat(task.getStartAt()).isEqualTo(Instant.parse("2024-02-01T00:00:00Z"));
         assertThat(task.getEndAt()).isEqualTo(Instant.parse("2024-03-01T00:00:00Z"));
         verify(taskMetrics).incrementUpdated();
     }

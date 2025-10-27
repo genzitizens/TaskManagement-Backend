@@ -24,6 +24,7 @@ class TaskDtoJsonTest {
                 15,
                 now,
                 now,
+                now,
                 now
         );
 
@@ -44,6 +45,7 @@ class TaskDtoJsonTest {
                   "description": "Details",
                   "isActivity": true,
                   "duration": 45,
+                  "startAt": "2023-12-31T00:00:00Z",
                   "endAt": "2024-01-01T00:00:00Z"
                 }
                 """;
@@ -52,6 +54,7 @@ class TaskDtoJsonTest {
 
         assertThat(req.activity()).isTrue();
         assertThat(req.duration()).isEqualTo(45);
+        assertThat(req.startAt()).isEqualTo(Instant.parse("2023-12-31T00:00:00Z"));
     }
 
     @Test
@@ -60,7 +63,8 @@ class TaskDtoJsonTest {
                 {
                   "title": "Example",
                   "isActivity": false,
-                  "duration": 10
+                  "duration": 10,
+                  "startAt": "2024-01-05T00:00:00Z"
                 }
                 """;
 
@@ -68,5 +72,6 @@ class TaskDtoJsonTest {
 
         assertThat(req.activity()).isFalse();
         assertThat(req.duration()).isEqualTo(10);
+        assertThat(req.startAt()).isEqualTo(Instant.parse("2024-01-05T00:00:00Z"));
     }
 }

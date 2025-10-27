@@ -12,6 +12,7 @@ public record TaskUpdateReq(
         String description,
         @JsonProperty("isActivity") Boolean activity,
         Integer duration,
+        Instant startAt,
         Instant endAt
 ) {
 }

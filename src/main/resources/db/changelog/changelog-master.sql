@@ -62,3 +62,16 @@ ALTER TABLE task
     ALTER COLUMN duration DROP DEFAULT;
 
 --rollback ALTER TABLE task DROP COLUMN duration;
+
+--changeset openai:005-add-task-start-at
+ALTER TABLE task
+    ADD COLUMN start_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+UPDATE task SET start_at = created_at WHERE start_at IS NULL;
+
+ALTER TABLE task
+    ALTER COLUMN start_at DROP DEFAULT;
+
+CREATE INDEX idx_task_start_at ON task (start_at);
+
+--rollback ALTER TABLE task DROP COLUMN start_at;

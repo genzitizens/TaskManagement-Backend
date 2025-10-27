@@ -49,6 +49,7 @@ class TaskControllerTest {
         UUID projectId = UUID.randomUUID();
         TaskCreateReq request = new TaskCreateReq(projectId, "Title", "Desc", true,
                 90,
+                Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-02-01T00:00:00Z"));
         TaskRes response = new TaskRes(
                 UUID.randomUUID(),
@@ -57,6 +58,7 @@ class TaskControllerTest {
                 "Desc",
                 true,
                 90,
+                request.startAt(),
                 request.endAt(),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
@@ -70,6 +72,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.id").value(response.id().toString()))
                 .andExpect(jsonPath("$.projectId").value(projectId.toString()))
                 .andExpect(jsonPath("$.isActivity").value(true))
+                .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
                 .andExpect(jsonPath("$.duration").value(90));
 
         ArgumentCaptor<TaskCreateReq> captor = ArgumentCaptor.forClass(TaskCreateReq.class);
@@ -87,6 +90,7 @@ class TaskControllerTest {
                 "Desc",
                 false,
                 45,
+                Instant.parse("2024-01-15T00:00:00Z"),
                 Instant.parse("2024-02-01T00:00:00Z"),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
@@ -98,6 +102,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.id").value(taskId.toString()))
                 .andExpect(jsonPath("$.title").value("Title"))
                 .andExpect(jsonPath("$.isActivity").value(false))
+                .andExpect(jsonPath("$.startAt").value(response.startAt().toString()))
                 .andExpect(jsonPath("$.duration").value(45));
 
         verify(taskService).get(taskId);
@@ -113,6 +118,7 @@ class TaskControllerTest {
                 "Desc",
                 false,
                 30,
+                Instant.parse("2024-01-05T00:00:00Z"),
                 Instant.parse("2024-02-01T00:00:00Z"),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
@@ -125,6 +131,7 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].projectId").value(projectId.toString()))
                 .andExpect(jsonPath("$.content[0].isActivity").value(false))
+                .andExpect(jsonPath("$.content[0].startAt").value(response.startAt().toString()))
                 .andExpect(jsonPath("$.content[0].duration").value(30));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
@@ -139,6 +146,7 @@ class TaskControllerTest {
         UUID taskId = UUID.randomUUID();
         TaskUpdateReq request = new TaskUpdateReq("Updated", "New", false,
                 120,
+                Instant.parse("2024-02-01T00:00:00Z"),
                 Instant.parse("2024-03-01T00:00:00Z"));
         TaskRes response = new TaskRes(
                 taskId,
@@ -147,6 +155,7 @@ class TaskControllerTest {
                 "New",
                 false,
                 120,
+                request.startAt(),
                 request.endAt(),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
@@ -160,6 +169,7 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.id").value(taskId.toString()))
                 .andExpect(jsonPath("$.title").value("Updated"))
                 .andExpect(jsonPath("$.isActivity").value(false))
+                .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
                 .andExpect(jsonPath("$.duration").value(120));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);

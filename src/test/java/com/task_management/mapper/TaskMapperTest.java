@@ -25,6 +25,7 @@ class TaskMapperTest {
         task.setTitle("Title");
         task.setDescription("Desc");
         task.setActivity(true);
+        task.setStartAt(Instant.now());
         task.setEndAt(Instant.now());
         task.setCreatedAt(Instant.now());
         task.setUpdatedAt(Instant.now());
