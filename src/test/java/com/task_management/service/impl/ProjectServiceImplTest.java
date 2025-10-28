@@ -16,6 +16,7 @@ import com.task_management.exception.NotFoundException;
 import com.task_management.mapper.ProjectMapper;
 import com.task_management.repository.ProjectRepository;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +53,7 @@ class ProjectServiceImplTest {
         project.setId(UUID.randomUUID());
         project.setName("Project Alpha");
         project.setDescription("Description");
+        project.setStartDate(LocalDate.of(2024, 1, 10));
         project.setCreatedAt(Instant.parse("2024-01-01T00:00:00Z"));
         project.setUpdatedAt(Instant.parse("2024-01-02T00:00:00Z"));
 
@@ -59,6 +61,7 @@ class ProjectServiceImplTest {
                 project.getId(),
                 project.getName(),
                 project.getDescription(),
+                project.getStartDate(),
                 project.getCreatedAt(),
                 project.getUpdatedAt()
         );
@@ -66,7 +69,7 @@ class ProjectServiceImplTest {
 
     @Test
     void create_whenNameAlreadyExists_throwsBadRequest() {
-        ProjectCreateReq request = new ProjectCreateReq("Project Alpha", "Description");
+        ProjectCreateReq request = new ProjectCreateReq("Project Alpha", "Description", LocalDate.of(2024, 1, 10));
         when(projectRepository.existsByNameIgnoreCase("Project Alpha")).thenReturn(true);
 
         assertThatExceptionOfType(BadRequestException.class)
@@ -78,8 +81,9 @@ class ProjectServiceImplTest {
 
     @Test
     void create_whenValid_savesAndReturnsResponse() {
-        ProjectCreateReq request = new ProjectCreateReq("Project Beta", "Description");
+        ProjectCreateReq request = new ProjectCreateReq("Project Beta", "Description", LocalDate.of(2024, 1, 10));
         Project entityToSave = new Project();
+        entityToSave.setStartDate(LocalDate.of(2024, 1, 10));
         when(projectRepository.existsByNameIgnoreCase("Project Beta")).thenReturn(false);
         when(projectMapper.toEntity(request)).thenReturn(entityToSave);
         when(projectRepository.save(entityToSave)).thenReturn(project);
@@ -130,7 +134,7 @@ class ProjectServiceImplTest {
         when(projectRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> projectService.update(id, new ProjectUpdateReq("Name", null)))
+                .isThrownBy(() -> projectService.update(id, new ProjectUpdateReq("Name", null, LocalDate.of(2024, 1, 10))))
                 .withMessage("Project not found");
     }
 
@@ -141,7 +145,7 @@ class ProjectServiceImplTest {
         when(projectRepository.existsByNameIgnoreCase("Another")).thenReturn(true);
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> projectService.update(id, new ProjectUpdateReq("Another", null)))
+                .isThrownBy(() -> projectService.update(id, new ProjectUpdateReq("Another", null, null)))
                 .withMessage("Project name already exists");
 
         verify(projectRepository, never()).save(any());
@@ -150,7 +154,7 @@ class ProjectServiceImplTest {
     @Test
     void update_whenValid_updatesEntityAndReturnsResponse() {
         UUID id = project.getId();
-        ProjectUpdateReq request = new ProjectUpdateReq("Project Gamma", "Updated");
+        ProjectUpdateReq request = new ProjectUpdateReq("Project Gamma", "Updated", LocalDate.of(2024, 1, 11));
         when(projectRepository.findById(id)).thenReturn(Optional.of(project));
         when(projectRepository.existsByNameIgnoreCase("Project Gamma")).thenReturn(false);
         when(projectRepository.save(project)).thenReturn(project);

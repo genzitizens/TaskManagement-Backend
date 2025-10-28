@@ -75,3 +75,14 @@ ALTER TABLE task
 CREATE INDEX idx_task_start_at ON task (start_at);
 
 --rollback ALTER TABLE task DROP COLUMN start_at;
+
+--changeset openai:006-add-project-start-date
+ALTER TABLE project
+    ADD COLUMN start_date DATE NOT NULL DEFAULT CURRENT_DATE;
+
+UPDATE project SET start_date = created_at::DATE WHERE start_date IS NULL;
+
+ALTER TABLE project
+    ALTER COLUMN start_date DROP DEFAULT;
+
+--rollback ALTER TABLE project DROP COLUMN start_date;

@@ -19,6 +19,7 @@ import com.task_management.repository.NoteRepository;
 import com.task_management.repository.ProjectRepository;
 import com.task_management.repository.TaskRepository;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,6 +63,7 @@ class NoteServiceImplTest {
         project = new Project();
         project.setId(UUID.randomUUID());
         project.setName("Project");
+        project.setStartDate(LocalDate.of(2024, 1, 1));
 
         task = new Task();
         task.setId(UUID.randomUUID());

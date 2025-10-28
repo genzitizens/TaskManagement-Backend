@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.task_management.entity.Project;
 import com.task_management.entity.Task;
 import java.time.Instant;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ class TaskRepositoryIntegrationTest {
         project = new Project();
         project.setName("Demo");
         project.setDescription("desc");
+        project.setStartDate(LocalDate.of(2023, 12, 1));
         project = projects.saveAndFlush(project);
     }
 
