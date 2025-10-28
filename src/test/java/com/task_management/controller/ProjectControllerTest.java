@@ -18,6 +18,7 @@ import com.task_management.dto.ProjectRes;
 import com.task_management.dto.ProjectUpdateReq;
 import com.task_management.service.ProjectService;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -46,11 +47,12 @@ class ProjectControllerTest {
 
     @Test
     void create_returnsCreatedProject() throws Exception {
-        ProjectCreateReq request = new ProjectCreateReq("Project", "Description");
+        ProjectCreateReq request = new ProjectCreateReq("Project", "Description", LocalDate.of(2024, 1, 15));
         ProjectRes response = new ProjectRes(
                 UUID.randomUUID(),
                 "Project",
                 "Description",
+                LocalDate.of(2024, 1, 15),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -61,7 +63,8 @@ class ProjectControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(response.id().toString()))
-                .andExpect(jsonPath("$.name").value("Project"));
+                .andExpect(jsonPath("$.name").value("Project"))
+                .andExpect(jsonPath("$.startDate").value("15-01-2024"));
 
         ArgumentCaptor<ProjectCreateReq> captor = ArgumentCaptor.forClass(ProjectCreateReq.class);
         verify(projectService).create(captor.capture());
@@ -75,6 +78,7 @@ class ProjectControllerTest {
                 projectId,
                 "Project",
                 "Description",
+                LocalDate.of(2024, 1, 15),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -83,7 +87,8 @@ class ProjectControllerTest {
         mockMvc.perform(get("/api/projects/{id}", projectId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(projectId.toString()))
-                .andExpect(jsonPath("$.name").value("Project"));
+                .andExpect(jsonPath("$.name").value("Project"))
+                .andExpect(jsonPath("$.startDate").value("15-01-2024"));
 
         verify(projectService).get(projectId);
     }
@@ -94,6 +99,7 @@ class ProjectControllerTest {
                 UUID.randomUUID(),
                 "Project",
                 "Description",
+                LocalDate.of(2024, 1, 15),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -104,7 +110,8 @@ class ProjectControllerTest {
         mockMvc.perform(get("/api/projects"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(response.id().toString()))
-                .andExpect(jsonPath("$.content[0].name").value("Project"));
+                .andExpect(jsonPath("$.content[0].name").value("Project"))
+                .andExpect(jsonPath("$.content[0].startDate").value("15-01-2024"));
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(projectService).list(captor.capture());
@@ -114,11 +121,12 @@ class ProjectControllerTest {
     @Test
     void update_returnsUpdatedProject() throws Exception {
         UUID projectId = UUID.randomUUID();
-        ProjectUpdateReq request = new ProjectUpdateReq("Updated", "New description");
+        ProjectUpdateReq request = new ProjectUpdateReq("Updated", "New description", LocalDate.of(2024, 1, 20));
         ProjectRes response = new ProjectRes(
                 projectId,
                 "Updated",
                 "New description",
+                LocalDate.of(2024, 1, 20),
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -129,7 +137,8 @@ class ProjectControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(projectId.toString()))
-                .andExpect(jsonPath("$.name").value("Updated"));
+                .andExpect(jsonPath("$.name").value("Updated"))
+                .andExpect(jsonPath("$.startDate").value("20-01-2024"));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<ProjectUpdateReq> reqCaptor = ArgumentCaptor.forClass(ProjectUpdateReq.class);

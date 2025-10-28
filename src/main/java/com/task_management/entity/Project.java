@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter @Setter
@@ -26,6 +27,9 @@ public class Project {
 
     @Column(columnDefinition = "text")
     private String description;
+
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
