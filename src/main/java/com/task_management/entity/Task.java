@@ -52,6 +52,12 @@ public class Task {
     @Column(name = "end_at", nullable = false)
     private Instant endAt;
 
+    @Column(name = "start_day", nullable = false)
+    private Integer startDay;
+
+    @Column(name = "end_day", nullable = false)
+    private Integer endDay;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

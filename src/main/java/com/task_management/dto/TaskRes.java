@@ -13,6 +13,8 @@ public record TaskRes(
         Integer duration,
         Instant startAt,
         Instant endAt,
+        Integer startDay,
+        Integer endDay,
         Instant createdAt,
         Instant updatedAt
 ) {

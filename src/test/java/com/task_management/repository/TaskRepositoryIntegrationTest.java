@@ -62,6 +62,8 @@ class TaskRepositoryIntegrationTest {
         task.setDuration(activity ? 60 : 30);
         task.setStartAt(Instant.parse("2023-12-01T00:00:00Z"));
         task.setEndAt(Instant.parse("2024-01-01T00:00:00Z"));
+        task.setStartDay(1);
+        task.setEndDay(32);
         return task;
     }
 }

@@ -86,3 +86,20 @@ ALTER TABLE project
     ALTER COLUMN start_date DROP DEFAULT;
 
 --rollback ALTER TABLE project DROP COLUMN start_date;
+
+--changeset openai:007-add-task-schedule-days
+ALTER TABLE task
+    ADD COLUMN start_day INTEGER NOT NULL DEFAULT 1,
+    ADD COLUMN end_day   INTEGER NOT NULL DEFAULT 1;
+
+UPDATE task t
+SET start_day = GREATEST(1, (t.start_at::date - p.start_date) + 1),
+    end_day   = GREATEST(start_day, (t.end_at::date - p.start_date) + 1)
+FROM project p
+WHERE t.project_id = p.id;
+
+ALTER TABLE task
+    ALTER COLUMN start_day DROP DEFAULT,
+    ALTER COLUMN end_day DROP DEFAULT;
+
+--rollback ALTER TABLE task DROP COLUMN start_day, DROP COLUMN end_day;

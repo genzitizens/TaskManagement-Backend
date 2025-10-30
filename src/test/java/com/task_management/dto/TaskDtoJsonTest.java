@@ -24,6 +24,8 @@ class TaskDtoJsonTest {
                 15,
                 now,
                 now,
+                1,
+                3,
                 now,
                 now
         );
@@ -34,6 +36,8 @@ class TaskDtoJsonTest {
 
         TaskRes roundTrip = mapper.readValue(json, TaskRes.class);
         assertThat(roundTrip.activity()).isTrue();
+        assertThat(roundTrip.startDay()).isEqualTo(1);
+        assertThat(roundTrip.endDay()).isEqualTo(3);
     }
 
     @Test
