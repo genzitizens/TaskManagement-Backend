@@ -12,6 +12,8 @@ import com.task_management.repository.ProjectRepository;
 import com.task_management.repository.TaskRepository;
 import com.task_management.service.TaskService;
 import jakarta.transaction.Transactional;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,7 @@ public class TaskServiceImpl implements TaskService {
         t.setDuration(req.duration());
         t.setStartAt(req.startAt());
         t.setEndAt(req.endAt());
+        applyScheduleDays(t);
 
         var savedTask = tasks.save(t);
         metrics.incrementCreated();
@@ -73,6 +76,7 @@ public class TaskServiceImpl implements TaskService {
         if (t.getStartAt() == null) throw new BadRequestException("startAt is required");
         if (t.getEndAt() == null) throw new BadRequestException("endAt is required");
         if (t.getDuration() == null) throw new BadRequestException("duration is required");
+        applyScheduleDays(t);
         var updatedTask = tasks.save(t);
         metrics.incrementUpdated();
         return mapper.toRes(updatedTask);
@@ -83,5 +87,27 @@ public class TaskServiceImpl implements TaskService {
         if (!tasks.existsById(id)) throw new NotFoundException("Task not found");
         tasks.deleteById(id);
         metrics.incrementDeleted();
+    }
+
+    private void applyScheduleDays(Task task) {
+        var project = task.getProject();
+        if (project == null || project.getStartDate() == null) {
+            throw new BadRequestException("Project start date is required");
+        }
+        var projectStart = project.getStartDate();
+        var startDate = task.getStartAt().atZone(ZoneOffset.UTC).toLocalDate();
+        var endDate = task.getEndAt().atZone(ZoneOffset.UTC).toLocalDate();
+
+        int startDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, startDate) + 1);
+        if (startDay < 1) {
+            throw new BadRequestException("startAt cannot be before the project start date");
+        }
+        int endDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, endDate) + 1);
+        if (endDay < startDay) {
+            throw new BadRequestException("endAt cannot be before startAt");
+        }
+
+        task.setStartDay(startDay);
+        task.setEndDay(endDay);
     }
 }
