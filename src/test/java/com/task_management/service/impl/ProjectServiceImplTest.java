@@ -15,6 +15,8 @@ import com.task_management.exception.BadRequestException;
 import com.task_management.exception.NotFoundException;
 import com.task_management.mapper.ProjectMapper;
 import com.task_management.repository.ProjectRepository;
+import com.task_management.repository.TaskRepository;
+import com.task_management.service.TaskScheduleCalculator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -39,7 +41,13 @@ class ProjectServiceImplTest {
     private ProjectRepository projectRepository;
 
     @Mock
+    private TaskRepository taskRepository;
+
+    @Mock
     private ProjectMapper projectMapper;
+
+    @Mock
+    private TaskScheduleCalculator scheduleCalculator;
 
     @InjectMocks
     private ProjectServiceImpl projectService;
@@ -157,6 +165,7 @@ class ProjectServiceImplTest {
         ProjectUpdateReq request = new ProjectUpdateReq("Project Gamma", "Updated", LocalDate.of(2024, 1, 11));
         when(projectRepository.findById(id)).thenReturn(Optional.of(project));
         when(projectRepository.existsByNameIgnoreCase("Project Gamma")).thenReturn(false);
+        when(taskRepository.findByProjectId(project.getId())).thenReturn(List.of());
         when(projectRepository.save(project)).thenReturn(project);
         when(projectMapper.toRes(project)).thenReturn(projectRes);
 
