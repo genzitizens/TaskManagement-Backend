@@ -18,6 +18,7 @@ import com.task_management.mapper.TaskMapper;
 import com.task_management.monitoring.TaskMetrics;
 import com.task_management.repository.ProjectRepository;
 import com.task_management.repository.TaskRepository;
+import com.task_management.service.TaskScheduleCalculator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,6 +51,9 @@ class TaskServiceImplTest {
 
     @Mock
     private TaskMetrics taskMetrics;
+
+    @Spy
+    private TaskScheduleCalculator scheduleCalculator;
 
     @InjectMocks
     private TaskServiceImpl taskService;
