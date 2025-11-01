@@ -98,11 +98,11 @@ public class TaskServiceImpl implements TaskService {
         var startDate = task.getStartAt().atZone(ZoneOffset.UTC).toLocalDate();
         var endDate = task.getEndAt().atZone(ZoneOffset.UTC).toLocalDate();
 
-        int startDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, startDate) + 1);
-        if (startDay < 1) {
+        int startDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, startDate));
+        if (startDay < 0) {
             throw new BadRequestException("startAt cannot be before the project start date");
         }
-        int endDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, endDate) + 1);
+        int endDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, endDate));
         if (endDay < startDay) {
             throw new BadRequestException("endAt cannot be before startAt");
         }
