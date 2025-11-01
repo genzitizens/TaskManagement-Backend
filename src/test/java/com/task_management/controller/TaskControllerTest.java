@@ -60,8 +60,8 @@ class TaskControllerTest {
                 90,
                 request.startAt(),
                 request.endAt(),
-                1,
-                32,
+                0,
+                31,
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -75,8 +75,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.projectId").value(projectId.toString()))
                 .andExpect(jsonPath("$.isActivity").value(true))
                 .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
-                .andExpect(jsonPath("$.startDay").value(1))
-                .andExpect(jsonPath("$.endDay").value(32))
+                .andExpect(jsonPath("$.startDay").value(0))
+                .andExpect(jsonPath("$.endDay").value(31))
                 .andExpect(jsonPath("$.duration").value(90));
 
         ArgumentCaptor<TaskCreateReq> captor = ArgumentCaptor.forClass(TaskCreateReq.class);
@@ -96,8 +96,8 @@ class TaskControllerTest {
                 45,
                 Instant.parse("2024-01-15T00:00:00Z"),
                 Instant.parse("2024-02-01T00:00:00Z"),
-                15,
-                32,
+                14,
+                31,
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -109,8 +109,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.title").value("Title"))
                 .andExpect(jsonPath("$.isActivity").value(false))
                 .andExpect(jsonPath("$.startAt").value(response.startAt().toString()))
-                .andExpect(jsonPath("$.startDay").value(15))
-                .andExpect(jsonPath("$.endDay").value(32))
+                .andExpect(jsonPath("$.startDay").value(14))
+                .andExpect(jsonPath("$.endDay").value(31))
                 .andExpect(jsonPath("$.duration").value(45));
 
         verify(taskService).get(taskId);
@@ -128,8 +128,8 @@ class TaskControllerTest {
                 30,
                 Instant.parse("2024-01-05T00:00:00Z"),
                 Instant.parse("2024-02-01T00:00:00Z"),
-                5,
-                32,
+                4,
+                31,
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -142,8 +142,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.content[0].projectId").value(projectId.toString()))
                 .andExpect(jsonPath("$.content[0].isActivity").value(false))
                 .andExpect(jsonPath("$.content[0].startAt").value(response.startAt().toString()))
-                .andExpect(jsonPath("$.content[0].startDay").value(5))
-                .andExpect(jsonPath("$.content[0].endDay").value(32))
+                .andExpect(jsonPath("$.content[0].startDay").value(4))
+                .andExpect(jsonPath("$.content[0].endDay").value(31))
                 .andExpect(jsonPath("$.content[0].duration").value(30));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
@@ -169,8 +169,8 @@ class TaskControllerTest {
                 120,
                 request.startAt(),
                 request.endAt(),
-                32,
-                61,
+                31,
+                60,
                 Instant.parse("2024-01-01T00:00:00Z"),
                 Instant.parse("2024-01-02T00:00:00Z")
         );
@@ -184,8 +184,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.title").value("Updated"))
                 .andExpect(jsonPath("$.isActivity").value(false))
                 .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
-                .andExpect(jsonPath("$.startDay").value(32))
-                .andExpect(jsonPath("$.endDay").value(61))
+                .andExpect(jsonPath("$.startDay").value(31))
+                .andExpect(jsonPath("$.endDay").value(60))
                 .andExpect(jsonPath("$.duration").value(120));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);

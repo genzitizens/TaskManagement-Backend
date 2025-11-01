@@ -163,8 +163,8 @@ class TaskServiceImplTest {
         assertThat(saved.getDuration()).isEqualTo(30);
         assertThat(saved.getStartAt()).isEqualTo(startAt);
         assertThat(saved.getEndAt()).isEqualTo(endAt);
-        assertThat(saved.getStartDay()).isEqualTo(1);
-        assertThat(saved.getEndDay()).isEqualTo(32);
+        assertThat(saved.getStartDay()).isEqualTo(0);
+        assertThat(saved.getEndDay()).isEqualTo(31);
         verify(taskMetrics).incrementCreated();
     }
 
@@ -295,8 +295,8 @@ class TaskServiceImplTest {
         assertThat(task.getDuration()).isEqualTo(45);
         assertThat(task.getStartAt()).isEqualTo(Instant.parse("2024-02-01T00:00:00Z"));
         assertThat(task.getEndAt()).isEqualTo(Instant.parse("2024-03-01T00:00:00Z"));
-        assertThat(task.getStartDay()).isEqualTo(32);
-        assertThat(task.getEndDay()).isEqualTo(61);
+        assertThat(task.getStartDay()).isEqualTo(31);
+        assertThat(task.getEndDay()).isEqualTo(60);
         verify(taskMetrics).incrementUpdated();
     }
 
