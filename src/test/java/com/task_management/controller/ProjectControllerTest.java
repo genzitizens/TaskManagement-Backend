@@ -54,7 +54,9 @@ class ProjectControllerTest {
                 "Description",
                 LocalDate.of(2024, 1, 15),
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                List.of(),
+                List.of()
         );
         when(projectService.create(any())).thenReturn(response);
 
@@ -64,7 +66,9 @@ class ProjectControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(response.id().toString()))
                 .andExpect(jsonPath("$.name").value("Project"))
-                .andExpect(jsonPath("$.startDate").value("15-01-2024"));
+                .andExpect(jsonPath("$.startDate").value("15-01-2024"))
+                .andExpect(jsonPath("$.tasks").isArray())
+                .andExpect(jsonPath("$.tags").isArray());
 
         ArgumentCaptor<ProjectCreateReq> captor = ArgumentCaptor.forClass(ProjectCreateReq.class);
         verify(projectService).create(captor.capture());
@@ -80,7 +84,9 @@ class ProjectControllerTest {
                 "Description",
                 LocalDate.of(2024, 1, 15),
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                List.of(),
+                List.of()
         );
         when(projectService.get(projectId)).thenReturn(response);
 
@@ -88,7 +94,9 @@ class ProjectControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(projectId.toString()))
                 .andExpect(jsonPath("$.name").value("Project"))
-                .andExpect(jsonPath("$.startDate").value("15-01-2024"));
+                .andExpect(jsonPath("$.startDate").value("15-01-2024"))
+                .andExpect(jsonPath("$.tasks").isArray())
+                .andExpect(jsonPath("$.tags").isArray());
 
         verify(projectService).get(projectId);
     }
@@ -101,7 +109,9 @@ class ProjectControllerTest {
                 "Description",
                 LocalDate.of(2024, 1, 15),
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                List.of(),
+                List.of()
         );
         Pageable pageable = PageRequest.of(0, 20);
         Page<ProjectRes> page = new PageImpl<>(List.of(response), pageable, 1);
@@ -111,7 +121,9 @@ class ProjectControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(response.id().toString()))
                 .andExpect(jsonPath("$.content[0].name").value("Project"))
-                .andExpect(jsonPath("$.content[0].startDate").value("15-01-2024"));
+                .andExpect(jsonPath("$.content[0].startDate").value("15-01-2024"))
+                .andExpect(jsonPath("$.content[0].tasks").isArray())
+                .andExpect(jsonPath("$.content[0].tags").isArray());
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
         verify(projectService).list(captor.capture());
@@ -128,7 +140,9 @@ class ProjectControllerTest {
                 "New description",
                 LocalDate.of(2024, 1, 20),
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                List.of(),
+                List.of()
         );
         when(projectService.update(any(), any())).thenReturn(response);
 
@@ -138,7 +152,9 @@ class ProjectControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(projectId.toString()))
                 .andExpect(jsonPath("$.name").value("Updated"))
-                .andExpect(jsonPath("$.startDate").value("20-01-2024"));
+                .andExpect(jsonPath("$.startDate").value("20-01-2024"))
+                .andExpect(jsonPath("$.tasks").isArray())
+                .andExpect(jsonPath("$.tags").isArray());
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<ProjectUpdateReq> reqCaptor = ArgumentCaptor.forClass(ProjectUpdateReq.class);

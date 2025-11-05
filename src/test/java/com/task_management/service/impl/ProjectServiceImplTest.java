@@ -63,7 +63,9 @@ class ProjectServiceImplTest {
                 project.getDescription(),
                 project.getStartDate(),
                 project.getCreatedAt(),
-                project.getUpdatedAt()
+                project.getUpdatedAt(),
+                List.of(),
+                List.of()
         );
     }
 

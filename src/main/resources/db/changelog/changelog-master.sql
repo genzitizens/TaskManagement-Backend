@@ -103,3 +103,27 @@ ALTER TABLE task
     ALTER COLUMN end_day DROP DEFAULT;
 
 --rollback ALTER TABLE task DROP COLUMN start_day, DROP COLUMN end_day;
+
+--changeset openai:008-create-tag
+CREATE TABLE tag
+(
+    id          UUID PRIMARY KEY,
+    project_id  UUID         NOT NULL,
+    title       VARCHAR(160) NOT NULL,
+    description TEXT,
+    is_activity BOOLEAN      NOT NULL,
+    end_at      TIMESTAMPTZ  NOT NULL,
+    duration    INTEGER      NOT NULL,
+    start_at    TIMESTAMPTZ  NOT NULL,
+    start_day   INTEGER      NOT NULL,
+    end_day     INTEGER      NOT NULL,
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_tag_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_tag_project ON tag (project_id);
+CREATE INDEX idx_tag_start_at ON tag (start_at);
+CREATE INDEX idx_tag_end_at ON tag (end_at);
+
+--rollback DROP TABLE tag;
