@@ -8,8 +8,8 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter @Setter
@@ -41,9 +41,11 @@ public class Project {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<Task> tasks = new ArrayList<>();
+    private Set<Task> tasks = new LinkedHashSet<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    private List<Tag> tags = new ArrayList<>();
+    private Set<Tag> tags = new LinkedHashSet<>();
 }
