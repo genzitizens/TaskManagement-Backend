@@ -16,8 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -102,20 +102,23 @@ public class TagServiceImpl implements TagService {
         }
 
         var projectStart = project.getStartDate();
-        var startDate = tag.getStartAt().atZone(ZoneOffset.UTC).toLocalDate();
-        var endDate = tag.getEndAt().atZone(ZoneOffset.UTC).toLocalDate();
+        var projectStartInstant = projectStart.atStartOfDay(ZoneOffset.UTC).toInstant();
 
-        int startDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, startDate));
+        long startDay = Duration.between(projectStartInstant, tag.getStartAt()).toDays();
         if (startDay < 0) {
             throw new BadRequestException("startAt cannot be before the project start date");
         }
 
-        int endDay = Math.toIntExact(ChronoUnit.DAYS.between(projectStart, endDate));
+        if (tag.getEndAt().isBefore(tag.getStartAt())) {
+            throw new BadRequestException("endAt cannot be before startAt");
+        }
+
+        long endDay = Duration.between(projectStartInstant, tag.getEndAt()).toDays();
         if (endDay < startDay) {
             throw new BadRequestException("endAt cannot be before startAt");
         }
 
-        tag.setStartDay(startDay);
-        tag.setEndDay(endDay);
+        tag.setStartDay(Math.toIntExact(startDay));
+        tag.setEndDay(Math.toIntExact(endDay));
     }
 }
