@@ -17,8 +17,11 @@ import com.task_management.exception.NotFoundException;
 import com.task_management.mapper.TagMapper;
 import com.task_management.repository.ProjectRepository;
 import com.task_management.repository.TagRepository;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -161,6 +164,41 @@ class TagServiceImplTest {
         assertThat(saved.getEndAt()).isEqualTo(endAt);
         assertThat(saved.getStartDay()).isEqualTo(0);
         assertThat(saved.getEndDay()).isEqualTo(31);
+    }
+
+    @Test
+    void create_whenStartAtSharesCalendarDayWithOffset_savesWithZeroStartDay() {
+        UUID projectId = project.getId();
+        Instant startAt = project.getStartDate().atStartOfDay().atOffset(ZoneOffset.ofHours(5)).toInstant();
+        Instant endAt = project.getStartDate().plusDays(1).atStartOfDay().atOffset(ZoneOffset.ofHours(5)).toInstant();
+        TagCreateReq request = new TagCreateReq(projectId, "Offset Tag", null, false, 45, startAt, endAt);
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+        when(tagRepository.save(any(Tag.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(tagMapper.toRes(any(Tag.class))).thenReturn(tagRes);
+
+        TagRes result = tagService.create(request);
+
+        assertThat(result).isSameAs(tagRes);
+        ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
+        verify(tagRepository).save(captor.capture());
+        Tag saved = captor.getValue();
+        assertThat(saved.getStartAt()).isEqualTo(startAt);
+        assertThat(saved.getStartDay()).isZero();
+    }
+
+    @Test
+    void create_whenStartAtBeforeProjectStart_throwsBadRequest() {
+        UUID projectId = project.getId();
+        Instant startAt = project.getStartDate().minusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+        Instant endAt = startAt.plus(Duration.ofDays(2));
+        TagCreateReq request = new TagCreateReq(projectId, "Early", null, false, 30, startAt, endAt);
+        when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+
+        assertThatExceptionOfType(BadRequestException.class)
+                .isThrownBy(() -> tagService.create(request))
+                .withMessage("startAt cannot be before the project start date");
+
+        verify(tagRepository, never()).save(any());
     }
 
     @Test
