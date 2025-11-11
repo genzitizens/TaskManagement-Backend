@@ -42,6 +42,7 @@ public class TaskServiceImpl implements TaskService {
         t.setDuration(req.duration());
         t.setStartAt(req.startAt());
         t.setEndAt(req.endAt());
+        t.setColor(normalizeColor(req.color()));
         applyScheduleDays(t);
 
         var savedTask = tasks.save(t);
@@ -73,6 +74,7 @@ public class TaskServiceImpl implements TaskService {
         if (req.duration() != null) t.setDuration(req.duration());
         if (req.startAt() != null) t.setStartAt(req.startAt());
         if (req.endAt() != null) t.setEndAt(req.endAt());
+        if (req.color() != null) t.setColor(normalizeColor(req.color()));
         if (t.getStartAt() == null) throw new BadRequestException("startAt is required");
         if (t.getEndAt() == null) throw new BadRequestException("endAt is required");
         if (t.getDuration() == null) throw new BadRequestException("duration is required");
@@ -109,5 +111,13 @@ public class TaskServiceImpl implements TaskService {
 
         task.setStartDay(startDay);
         task.setEndDay(endDay);
+    }
+
+    private String normalizeColor(String color) {
+        if (color == null) {
+            return null;
+        }
+        var trimmed = color.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

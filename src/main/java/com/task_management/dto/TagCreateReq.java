@@ -15,6 +15,7 @@ public record TagCreateReq(
         @JsonProperty("isActivity") boolean activity,
         @NotNull Integer duration,
         @NotNull Instant startAt,
-        @NotNull Instant endAt
+        @NotNull Instant endAt,
+        @Size(max = 32) String color
 ) {
 }

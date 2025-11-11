@@ -16,6 +16,7 @@ public record TaskRes(
         Integer startDay,
         Integer endDay,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        String color
 ) {
 }

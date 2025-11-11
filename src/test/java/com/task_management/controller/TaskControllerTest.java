@@ -50,7 +50,8 @@ class TaskControllerTest {
         TaskCreateReq request = new TaskCreateReq(projectId, "Title", "Desc", true,
                 90,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-02-01T00:00:00Z"));
+                Instant.parse("2024-02-01T00:00:00Z"),
+                "#112233");
         TaskRes response = new TaskRes(
                 UUID.randomUUID(),
                 projectId,
@@ -63,7 +64,8 @@ class TaskControllerTest {
                 0,
                 31,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#112233"
         );
         when(taskService.create(any())).thenReturn(response);
 
@@ -77,7 +79,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
                 .andExpect(jsonPath("$.startDay").value(0))
                 .andExpect(jsonPath("$.endDay").value(31))
-                .andExpect(jsonPath("$.duration").value(90));
+                .andExpect(jsonPath("$.duration").value(90))
+                .andExpect(jsonPath("$.color").value("#112233"));
 
         ArgumentCaptor<TaskCreateReq> captor = ArgumentCaptor.forClass(TaskCreateReq.class);
         verify(taskService).create(captor.capture());
@@ -99,7 +102,8 @@ class TaskControllerTest {
                 14,
                 31,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#445566"
         );
         when(taskService.get(taskId)).thenReturn(response);
 
@@ -111,7 +115,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.startAt").value(response.startAt().toString()))
                 .andExpect(jsonPath("$.startDay").value(14))
                 .andExpect(jsonPath("$.endDay").value(31))
-                .andExpect(jsonPath("$.duration").value(45));
+                .andExpect(jsonPath("$.duration").value(45))
+                .andExpect(jsonPath("$.color").value("#445566"));
 
         verify(taskService).get(taskId);
     }
@@ -131,7 +136,8 @@ class TaskControllerTest {
                 4,
                 31,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#778899"
         );
         Pageable pageable = PageRequest.of(0, 20);
         Page<TaskRes> page = new PageImpl<>(List.of(response), pageable, 1);
@@ -144,7 +150,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.content[0].startAt").value(response.startAt().toString()))
                 .andExpect(jsonPath("$.content[0].startDay").value(4))
                 .andExpect(jsonPath("$.content[0].endDay").value(31))
-                .andExpect(jsonPath("$.content[0].duration").value(30));
+                .andExpect(jsonPath("$.content[0].duration").value(30))
+                .andExpect(jsonPath("$.content[0].color").value("#778899"));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
@@ -159,7 +166,8 @@ class TaskControllerTest {
         TaskUpdateReq request = new TaskUpdateReq("Updated", "New", false,
                 120,
                 Instant.parse("2024-02-01T00:00:00Z"),
-                Instant.parse("2024-03-01T00:00:00Z"));
+                Instant.parse("2024-03-01T00:00:00Z"),
+                "#ABCDEF");
         TaskRes response = new TaskRes(
                 taskId,
                 UUID.randomUUID(),
@@ -172,7 +180,8 @@ class TaskControllerTest {
                 31,
                 60,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#ABCDEF"
         );
         when(taskService.update(any(), any())).thenReturn(response);
 
@@ -186,7 +195,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
                 .andExpect(jsonPath("$.startDay").value(31))
                 .andExpect(jsonPath("$.endDay").value(60))
-                .andExpect(jsonPath("$.duration").value(120));
+                .andExpect(jsonPath("$.duration").value(120))
+                .andExpect(jsonPath("$.color").value("#ABCDEF"));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<TaskUpdateReq> reqCaptor = ArgumentCaptor.forClass(TaskUpdateReq.class);

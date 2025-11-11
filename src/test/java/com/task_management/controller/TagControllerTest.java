@@ -50,7 +50,8 @@ class TagControllerTest {
         TagCreateReq request = new TagCreateReq(projectId, "Title", "Desc", true,
                 90,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-02-01T00:00:00Z"));
+                Instant.parse("2024-02-01T00:00:00Z"),
+                "#AA11BB");
         TagRes response = new TagRes(
                 UUID.randomUUID(),
                 projectId,
@@ -63,7 +64,8 @@ class TagControllerTest {
                 0,
                 31,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#AA11BB"
         );
         when(tagService.create(any())).thenReturn(response);
 
@@ -77,7 +79,8 @@ class TagControllerTest {
                 .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
                 .andExpect(jsonPath("$.startDay").value(0))
                 .andExpect(jsonPath("$.endDay").value(31))
-                .andExpect(jsonPath("$.duration").value(90));
+                .andExpect(jsonPath("$.duration").value(90))
+                .andExpect(jsonPath("$.color").value("#AA11BB"));
 
         ArgumentCaptor<TagCreateReq> captor = ArgumentCaptor.forClass(TagCreateReq.class);
         verify(tagService).create(captor.capture());
@@ -99,7 +102,8 @@ class TagControllerTest {
                 14,
                 31,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#BB22CC"
         );
         when(tagService.get(tagId)).thenReturn(response);
 
@@ -111,7 +115,8 @@ class TagControllerTest {
                 .andExpect(jsonPath("$.startAt").value(response.startAt().toString()))
                 .andExpect(jsonPath("$.startDay").value(14))
                 .andExpect(jsonPath("$.endDay").value(31))
-                .andExpect(jsonPath("$.duration").value(45));
+                .andExpect(jsonPath("$.duration").value(45))
+                .andExpect(jsonPath("$.color").value("#BB22CC"));
 
         verify(tagService).get(tagId);
     }
@@ -131,7 +136,8 @@ class TagControllerTest {
                 4,
                 31,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#CC33DD"
         );
         Pageable pageable = PageRequest.of(0, 20);
         Page<TagRes> page = new PageImpl<>(List.of(response), pageable, 1);
@@ -144,7 +150,8 @@ class TagControllerTest {
                 .andExpect(jsonPath("$.content[0].startAt").value(response.startAt().toString()))
                 .andExpect(jsonPath("$.content[0].startDay").value(4))
                 .andExpect(jsonPath("$.content[0].endDay").value(31))
-                .andExpect(jsonPath("$.content[0].duration").value(30));
+                .andExpect(jsonPath("$.content[0].duration").value(30))
+                .andExpect(jsonPath("$.content[0].color").value("#CC33DD"));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
@@ -159,7 +166,8 @@ class TagControllerTest {
         TagUpdateReq request = new TagUpdateReq("Updated", "New", false,
                 120,
                 Instant.parse("2024-02-01T00:00:00Z"),
-                Instant.parse("2024-03-01T00:00:00Z"));
+                Instant.parse("2024-03-01T00:00:00Z"),
+                "#DD44EE");
         TagRes response = new TagRes(
                 tagId,
                 UUID.randomUUID(),
@@ -172,7 +180,8 @@ class TagControllerTest {
                 31,
                 60,
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#DD44EE"
         );
         when(tagService.update(any(), any())).thenReturn(response);
 
@@ -186,7 +195,8 @@ class TagControllerTest {
                 .andExpect(jsonPath("$.startAt").value(request.startAt().toString()))
                 .andExpect(jsonPath("$.startDay").value(31))
                 .andExpect(jsonPath("$.endDay").value(60))
-                .andExpect(jsonPath("$.duration").value(120));
+                .andExpect(jsonPath("$.duration").value(120))
+                .andExpect(jsonPath("$.color").value("#DD44EE"));
 
         ArgumentCaptor<UUID> idCaptor = ArgumentCaptor.forClass(UUID.class);
         ArgumentCaptor<TagUpdateReq> reqCaptor = ArgumentCaptor.forClass(TagUpdateReq.class);
