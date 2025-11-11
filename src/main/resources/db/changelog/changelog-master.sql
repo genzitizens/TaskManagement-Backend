@@ -127,3 +127,13 @@ CREATE INDEX idx_tag_start_at ON tag (start_at);
 CREATE INDEX idx_tag_end_at ON tag (end_at);
 
 --rollback DROP TABLE tag;
+
+--changeset openai:009-add-task-tag-color
+ALTER TABLE task
+    ADD COLUMN color VARCHAR(32);
+
+ALTER TABLE tag
+    ADD COLUMN color VARCHAR(32);
+
+--rollback ALTER TABLE tag DROP COLUMN color;
+--rollback ALTER TABLE task DROP COLUMN color;

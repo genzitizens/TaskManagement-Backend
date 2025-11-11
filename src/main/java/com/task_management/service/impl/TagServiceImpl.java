@@ -45,6 +45,7 @@ public class TagServiceImpl implements TagService {
         tag.setDuration(req.duration());
         tag.setStartAt(req.startAt());
         tag.setEndAt(req.endAt());
+        tag.setColor(normalizeColor(req.color()));
 
         applyScheduleDays(tag);
 
@@ -79,6 +80,7 @@ public class TagServiceImpl implements TagService {
         if (req.duration() != null) tag.setDuration(req.duration());
         if (req.startAt() != null) tag.setStartAt(req.startAt());
         if (req.endAt() != null) tag.setEndAt(req.endAt());
+        if (req.color() != null) tag.setColor(normalizeColor(req.color()));
 
         if (tag.getStartAt() == null) throw new BadRequestException("startAt is required");
         if (tag.getEndAt() == null) throw new BadRequestException("endAt is required");
@@ -120,5 +122,13 @@ public class TagServiceImpl implements TagService {
 
         tag.setStartDay(Math.toIntExact(startDay));
         tag.setEndDay(Math.toIntExact(endDay));
+    }
+
+    private String normalizeColor(String color) {
+        if (color == null) {
+            return null;
+        }
+        var trimmed = color.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

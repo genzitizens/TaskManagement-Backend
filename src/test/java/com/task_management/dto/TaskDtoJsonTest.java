@@ -27,7 +27,8 @@ class TaskDtoJsonTest {
                 0,
                 2,
                 now,
-                now
+                now,
+                "#FF00FF"
         );
 
         String json = mapper.writeValueAsString(res);
@@ -38,6 +39,7 @@ class TaskDtoJsonTest {
         assertThat(roundTrip.activity()).isTrue();
         assertThat(roundTrip.startDay()).isEqualTo(0);
         assertThat(roundTrip.endDay()).isEqualTo(2);
+        assertThat(roundTrip.color()).isEqualTo("#FF00FF");
     }
 
     @Test
@@ -50,7 +52,8 @@ class TaskDtoJsonTest {
                   "isActivity": true,
                   "duration": 45,
                   "startAt": "2023-12-31T00:00:00Z",
-                  "endAt": "2024-01-01T00:00:00Z"
+                  "endAt": "2024-01-01T00:00:00Z",
+                  "color": "#123456"
                 }
                 """;
 
@@ -59,6 +62,7 @@ class TaskDtoJsonTest {
         assertThat(req.activity()).isTrue();
         assertThat(req.duration()).isEqualTo(45);
         assertThat(req.startAt()).isEqualTo(Instant.parse("2023-12-31T00:00:00Z"));
+        assertThat(req.color()).isEqualTo("#123456");
     }
 
     @Test
@@ -68,7 +72,8 @@ class TaskDtoJsonTest {
                   "title": "Example",
                   "isActivity": false,
                   "duration": 10,
-                  "startAt": "2024-01-05T00:00:00Z"
+                  "startAt": "2024-01-05T00:00:00Z",
+                  "color": "#654321"
                 }
                 """;
 
@@ -77,5 +82,6 @@ class TaskDtoJsonTest {
         assertThat(req.activity()).isFalse();
         assertThat(req.duration()).isEqualTo(10);
         assertThat(req.startAt()).isEqualTo(Instant.parse("2024-01-05T00:00:00Z"));
+        assertThat(req.color()).isEqualTo("#654321");
     }
 }

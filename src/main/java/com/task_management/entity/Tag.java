@@ -60,6 +60,9 @@ public class Tag {
     @Column(name = "end_day", nullable = false)
     private Integer endDay;
 
+    @Column(length = 32)
+    private String color;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

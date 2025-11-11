@@ -13,6 +13,7 @@ public record TagUpdateReq(
         @JsonProperty("isActivity") Boolean activity,
         Integer duration,
         Instant startAt,
-        Instant endAt
+        Instant endAt,
+        @Size(max = 32) String color
 ) {
 }

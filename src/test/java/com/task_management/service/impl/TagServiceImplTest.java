@@ -74,6 +74,7 @@ class TagServiceImplTest {
         tag.setEndAt(Instant.parse("2024-01-10T12:00:00Z"));
         tag.setStartDay(9);
         tag.setEndDay(10);
+        tag.setColor("#ABCDEF");
 
         tagRes = new TagRes(
                 tag.getId(),
@@ -87,14 +88,15 @@ class TagServiceImplTest {
                 tag.getStartDay(),
                 tag.getEndDay(),
                 Instant.parse("2024-01-01T00:00:00Z"),
-                Instant.parse("2024-01-02T00:00:00Z")
+                Instant.parse("2024-01-02T00:00:00Z"),
+                "#ABCDEF"
         );
     }
 
     @Test
     void create_whenProjectMissing_throwsNotFound() {
         UUID projectId = UUID.randomUUID();
-        TagCreateReq request = new TagCreateReq(projectId, "Title", null, false, 30, Instant.now(), Instant.now());
+        TagCreateReq request = new TagCreateReq(projectId, "Title", null, false, 30, Instant.now(), Instant.now(), null);
         when(projectRepository.findById(projectId)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
@@ -105,7 +107,7 @@ class TagServiceImplTest {
     @Test
     void create_whenEndAtMissing_throwsBadRequest() {
         UUID projectId = project.getId();
-        TagCreateReq request = new TagCreateReq(projectId, "Title", null, false, 30, Instant.now(), null);
+        TagCreateReq request = new TagCreateReq(projectId, "Title", null, false, 30, Instant.now(), null, null);
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         assertThatExceptionOfType(BadRequestException.class)
@@ -118,7 +120,7 @@ class TagServiceImplTest {
     @Test
     void create_whenStartAtMissing_throwsBadRequest() {
         UUID projectId = project.getId();
-        TagCreateReq request = new TagCreateReq(projectId, "Title", null, false, 30, null, Instant.now());
+        TagCreateReq request = new TagCreateReq(projectId, "Title", null, false, 30, null, Instant.now(), null);
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         assertThatExceptionOfType(BadRequestException.class)
@@ -131,7 +133,7 @@ class TagServiceImplTest {
     @Test
     void create_whenTitleBlankAfterTrim_throwsBadRequest() {
         UUID projectId = project.getId();
-        TagCreateReq request = new TagCreateReq(projectId, "   ", null, false, 30, Instant.now(), Instant.now());
+        TagCreateReq request = new TagCreateReq(projectId, "   ", null, false, 30, Instant.now(), Instant.now(), null);
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         assertThatExceptionOfType(BadRequestException.class)
@@ -144,7 +146,7 @@ class TagServiceImplTest {
         UUID projectId = project.getId();
         Instant startAt = Instant.parse("2024-01-01T00:00:00Z");
         Instant endAt = Instant.parse("2024-02-01T00:00:00Z");
-        TagCreateReq request = new TagCreateReq(projectId, "  Important Tag  ", "Desc", true, 30, startAt, endAt);
+        TagCreateReq request = new TagCreateReq(projectId, "  Important Tag  ", "Desc", true, 30, startAt, endAt, "  #112233  ");
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(tagRepository.save(any(Tag.class))).thenReturn(tag);
         when(tagMapper.toRes(tag)).thenReturn(tagRes);
@@ -164,6 +166,7 @@ class TagServiceImplTest {
         assertThat(saved.getEndAt()).isEqualTo(endAt);
         assertThat(saved.getStartDay()).isEqualTo(0);
         assertThat(saved.getEndDay()).isEqualTo(31);
+        assertThat(saved.getColor()).isEqualTo("#112233");
     }
 
     @Test
@@ -171,7 +174,7 @@ class TagServiceImplTest {
         UUID projectId = project.getId();
         Instant startAt = project.getStartDate().atStartOfDay().atOffset(ZoneOffset.ofHours(5)).toInstant();
         Instant endAt = project.getStartDate().plusDays(1).atStartOfDay().atOffset(ZoneOffset.ofHours(5)).toInstant();
-        TagCreateReq request = new TagCreateReq(projectId, "Offset Tag", null, false, 45, startAt, endAt);
+        TagCreateReq request = new TagCreateReq(projectId, "Offset Tag", null, false, 45, startAt, endAt, null);
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
         when(tagRepository.save(any(Tag.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(tagMapper.toRes(any(Tag.class))).thenReturn(tagRes);
@@ -191,7 +194,7 @@ class TagServiceImplTest {
         UUID projectId = project.getId();
         Instant startAt = project.getStartDate().minusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
         Instant endAt = startAt.plus(Duration.ofDays(2));
-        TagCreateReq request = new TagCreateReq(projectId, "Early", null, false, 30, startAt, endAt);
+        TagCreateReq request = new TagCreateReq(projectId, "Early", null, false, 30, startAt, endAt, null);
         when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
         assertThatExceptionOfType(BadRequestException.class)
@@ -253,7 +256,7 @@ class TagServiceImplTest {
         when(tagRepository.findById(tagId)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> tagService.update(tagId, new TagUpdateReq(null, null, null, null, null, null)))
+                .isThrownBy(() -> tagService.update(tagId, new TagUpdateReq(null, null, null, null, null, null, null)))
                 .withMessage("Tag not found");
     }
 
@@ -263,7 +266,7 @@ class TagServiceImplTest {
         when(tagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> tagService.update(tagId, new TagUpdateReq("   ", null, null, null, null, null)))
+                .isThrownBy(() -> tagService.update(tagId, new TagUpdateReq("   ", null, null, null, null, null, null)))
                 .withMessage("Tag title cannot be blank");
     }
 
@@ -276,7 +279,7 @@ class TagServiceImplTest {
         when(tagRepository.findById(existing.getId())).thenReturn(Optional.of(existing));
 
         assertThatExceptionOfType(BadRequestException.class)
-                .isThrownBy(() -> tagService.update(existing.getId(), new TagUpdateReq(null, null, null, null, null, null)))
+                .isThrownBy(() -> tagService.update(existing.getId(), new TagUpdateReq(null, null, null, null, null, null, null)))
                 .withMessage("startAt is required");
     }
 
@@ -285,7 +288,7 @@ class TagServiceImplTest {
         UUID tagId = tag.getId();
         TagUpdateReq request = new TagUpdateReq("Updated", "New", false, 40,
                 Instant.parse("2024-01-11T00:00:00Z"),
-                Instant.parse("2024-01-12T00:00:00Z"));
+                Instant.parse("2024-01-12T00:00:00Z"), "  #445566  ");
         when(tagRepository.findById(tagId)).thenReturn(Optional.of(tag));
         when(tagRepository.save(tag)).thenReturn(tag);
         when(tagMapper.toRes(tag)).thenReturn(tagRes);
@@ -294,6 +297,7 @@ class TagServiceImplTest {
 
         assertThat(result).isSameAs(tagRes);
         verify(tagRepository).save(tag);
+        assertThat(tag.getColor()).isEqualTo("#445566");
     }
 
     @Test
