@@ -137,3 +137,20 @@ ALTER TABLE tag
 
 --rollback ALTER TABLE tag DROP COLUMN color;
 --rollback ALTER TABLE task DROP COLUMN color;
+
+--changeset openai:010-create-action
+CREATE TABLE action
+(
+    id         UUID PRIMARY KEY,
+    task_id    UUID        NOT NULL,
+    details    TEXT        NOT NULL,
+    day        INTEGER     NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_action_task FOREIGN KEY (task_id) REFERENCES task (id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_action_task ON action (task_id);
+CREATE INDEX idx_action_day ON action (day);
+
+--rollback DROP TABLE action;
