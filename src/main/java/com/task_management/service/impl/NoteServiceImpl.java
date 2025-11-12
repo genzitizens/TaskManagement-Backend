@@ -3,6 +3,7 @@ package com.task_management.service.impl;
 
 import com.task_management.dto.NoteCreateReq;
 import com.task_management.dto.NoteRes;
+import com.task_management.dto.NoteUpdateReq;
 import com.task_management.entity.Note;
 import com.task_management.mapper.NoteMapper;
 import com.task_management.repository.NoteRepository;
@@ -54,6 +55,17 @@ public class NoteServiceImpl implements NoteService {
     public Page<NoteRes> listForTask(UUID taskId, Pageable pageable) {
         if (!tasks.existsById(taskId)) throw new NotFoundException("Task not found");
         return notes.findByTaskIdOrderByCreatedAtDesc(taskId, pageable).map(mapper::toRes);
+    }
+
+    @Override
+    public NoteRes update(UUID noteId, NoteUpdateReq req) {
+        var note = notes.findById(noteId).orElseThrow(() -> new NotFoundException("Note not found"));
+        
+        if (req.body() != null) {
+            note.setBody(req.body());
+        }
+        
+        return mapper.toRes(notes.save(note));
     }
 
     @Override

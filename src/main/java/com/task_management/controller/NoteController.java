@@ -2,6 +2,7 @@ package com.task_management.controller;
 
 import com.task_management.dto.NoteCreateReq;
 import com.task_management.dto.NoteRes;
+import com.task_management.dto.NoteUpdateReq;
 import com.task_management.exception.BadRequestException;
 import com.task_management.service.NoteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,6 +75,21 @@ public class NoteController {
         return hasProject
                 ? noteService.listForProject(projectId, pageable)
                 : noteService.listForTask(taskId, pageable);
+    }
+
+    @PatchMapping("/{noteId}")
+    @Operation(
+            summary = "Update note",
+            description = "Updates the content of a note.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Note updated"),
+                    @ApiResponse(responseCode = "404", description = "Note not found"),
+                    @ApiResponse(responseCode = "400", description = "Validation failure")
+            }
+    )
+    public NoteRes update(@Parameter(description = "Note identifier") @PathVariable UUID noteId,
+                          @Valid @RequestBody NoteUpdateReq req) {
+        return noteService.update(noteId, req);
     }
 
     @DeleteMapping("/{noteId}")
