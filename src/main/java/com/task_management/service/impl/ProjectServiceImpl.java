@@ -80,7 +80,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project newProject = Project.builder()
                 .name(req.newProjectName())
                 .description(req.description() != null ? req.description() : sourceProject.getDescription())
-                .startDate(LocalDate.now())
+                .startDate(sourceProject.getStartDate())
                 .build();
         
         newProject = projects.save(newProject);

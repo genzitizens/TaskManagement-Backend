@@ -154,8 +154,9 @@ The import functionality allows selective importing:
 
 ## Notes
 
-1. When importing a project, the new project will have today's date as the start date
+1. When importing a project, the new project will copy the start date from the source project
 2. All timestamps (createdAt, updatedAt) for imported items will be set to the current time
 3. The import is transactional - if any part fails, the entire import is rolled back
 4. Project names must be unique across the system
 5. The import preserves all task/tag/note properties except for IDs and timestamps
+6. If no description is provided in the import request, the source project's description will be used
