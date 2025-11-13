@@ -25,6 +25,6 @@ public interface ActionRepository extends JpaRepository<Action, UUID> {
     
     boolean existsByIdAndTaskId(UUID actionId, UUID taskId);
     
-    @Query("select a from Action a where a.task.project.id = :projectId")
+    @Query("select a from Action a join fetch a.task t where t.project.id = :projectId")
     List<Action> findByProjectId(@Param("projectId") UUID projectId);
 }

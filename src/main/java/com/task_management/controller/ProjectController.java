@@ -65,22 +65,6 @@ public class ProjectController {
         return projectService.importProject(req);
     }
 
-    @PostMapping("/import")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(
-            summary = "Import project",
-            description = "Creates a new project by importing data from an existing project. " +
-                         "You can selectively import tasks, notes, and tags from the source project.",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Project imported successfully"),
-                    @ApiResponse(responseCode = "400", description = "Validation failure or target project name already exists"),
-                    @ApiResponse(responseCode = "404", description = "Source project not found")
-            }
-    )
-    public ProjectImportRes importProject(@Valid @RequestBody ProjectImportReq req) {
-        return projectService.importProject(req);
-    }
-
     @GetMapping("/{projectId}")
     @Operation(
             summary = "Get project",

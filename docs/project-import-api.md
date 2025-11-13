@@ -133,7 +133,7 @@ curl -X POST http://localhost:8080/api/projects/import \
 The import functionality allows selective importing:
 
 - **importTasks**: Set to `true` to copy all tasks from the source project
-- **importNotes**: Set to `true` to copy all project-level notes (task-specific notes are not imported)
+- **importNotes**: Set to `true` to copy all notes (both project-level and task-specific notes)
 - **importTags**: Set to `true` to copy all tags from the source project
 - **importActions**: Set to `true` to copy all actions from the source project (requires `importTasks` to be `true`)
 
@@ -166,4 +166,6 @@ The import functionality allows selective importing:
 5. The import preserves all task/tag/note/action properties except for IDs and timestamps
 6. If no description is provided in the import request, the source project's description will be used
 7. **Actions can only be imported if tasks are also imported** (since actions belong to tasks)
-8. Actions will be properly linked to their corresponding imported tasks
+8. **Task-specific notes can only be imported if tasks are also imported** (since they belong to tasks)
+9. Actions and task-specific notes will be properly linked to their corresponding imported tasks
+10. Project-level notes are imported independently and don't require task import

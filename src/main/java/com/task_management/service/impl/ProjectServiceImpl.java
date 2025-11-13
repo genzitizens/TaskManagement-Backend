@@ -143,8 +143,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         // Import notes if requested
         if (req.importNotes()) {
-            List<Note> sourceNotes = notes.findByProjectId(req.sourceProjectId());
-            for (Note sourceNote : sourceNotes) {
+            // Import project-level notes
+            List<Note> sourceProjectNotes = notes.findByProjectId(req.sourceProjectId());
+            for (Note sourceNote : sourceProjectNotes) {
                 Note newNote = Note.builder()
                         .project(newProject)
                         .body(sourceNote.getBody())
@@ -152,13 +153,32 @@ public class ProjectServiceImpl implements ProjectService {
                 notes.save(newNote);
                 importedNotesCount++;
             }
+            
+            // Import task-specific notes (only if tasks were also imported)
+            if (req.importTasks() && !oldTaskIdToNewTask.isEmpty()) {
+                List<Note> sourceTaskNotes = notes.findTaskNotesByProjectId(req.sourceProjectId());
+                for (Note sourceNote : sourceTaskNotes) {
+                    UUID oldTaskId = sourceNote.getTask().getId();
+                    Task newTask = oldTaskIdToNewTask.get(oldTaskId);
+                    if (newTask != null) {
+                        Note newNote = Note.builder()
+                                .task(newTask)
+                                .body(sourceNote.getBody())
+                                .build();
+                        notes.save(newNote);
+                        importedNotesCount++;
+                    }
+                }
+            }
         }
 
         // Import actions if requested (only if tasks were also imported)
         if (req.importActions() && req.importTasks() && !oldTaskIdToNewTask.isEmpty()) {
             List<Action> sourceActions = actions.findByProjectId(req.sourceProjectId());
             for (Action sourceAction : sourceActions) {
-                Task newTask = oldTaskIdToNewTask.get(sourceAction.getTask().getId());
+                // Ensure task is loaded to avoid lazy loading issues
+                UUID oldTaskId = sourceAction.getTask().getId();
+                Task newTask = oldTaskIdToNewTask.get(oldTaskId);
                 if (newTask != null) {
                     Action newAction = Action.builder()
                             .task(newTask)
