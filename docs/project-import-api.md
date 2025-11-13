@@ -37,7 +37,8 @@
     "description": "This project was imported from an existing one",
     "importTasks": true,
     "importNotes": true,
-    "importTags": true
+    "importTags": true,
+    "importActions": true
 }
 ```
 
@@ -49,7 +50,8 @@
     "importedTasksCount": 15,
     "importedNotesCount": 8,
     "importedTagsCount": 3,
-    "message": "Successfully imported project 'Imported Project Copy' with 15 tasks, 8 notes, and 3 tags"
+    "importedActionsCount": 22,
+    "message": "Successfully imported project 'Imported Project Copy' with 15 tasks, 8 notes, 3 tags, and 22 actions"
 }
 ```
 
@@ -95,7 +97,8 @@ const importedProject = await importProject({
     description: "Copy of Q4 marketing project for testing",
     importTasks: true,
     importNotes: false,
-    importTags: true
+    importTags: true,
+    importActions: true
 });
 ```
 
@@ -120,7 +123,8 @@ curl -X POST http://localhost:8080/api/projects/import \
     "description": "Imported from existing project",
     "importTasks": true,
     "importNotes": true,
-    "importTags": false
+    "importTags": false,
+    "importActions": true
   }'
 ```
 
@@ -131,6 +135,7 @@ The import functionality allows selective importing:
 - **importTasks**: Set to `true` to copy all tasks from the source project
 - **importNotes**: Set to `true` to copy all project-level notes (task-specific notes are not imported)
 - **importTags**: Set to `true` to copy all tags from the source project
+- **importActions**: Set to `true` to copy all actions from the source project (requires `importTasks` to be `true`)
 
 ## Error Handling
 
@@ -158,5 +163,7 @@ The import functionality allows selective importing:
 2. All timestamps (createdAt, updatedAt) for imported items will be set to the current time
 3. The import is transactional - if any part fails, the entire import is rolled back
 4. Project names must be unique across the system
-5. The import preserves all task/tag/note properties except for IDs and timestamps
+5. The import preserves all task/tag/note/action properties except for IDs and timestamps
 6. If no description is provided in the import request, the source project's description will be used
+7. **Actions can only be imported if tasks are also imported** (since actions belong to tasks)
+8. Actions will be properly linked to their corresponding imported tasks

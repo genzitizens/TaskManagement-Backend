@@ -12,6 +12,7 @@ public record ProjectImportReq(
         @Size(max = 10_000) String description,
         boolean importTasks,
         boolean importNotes,
-        boolean importTags
+        boolean importTags,
+        boolean importActions
 ) {
 }

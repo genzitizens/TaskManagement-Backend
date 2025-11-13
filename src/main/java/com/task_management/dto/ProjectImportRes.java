@@ -8,6 +8,7 @@ public record ProjectImportRes(
         int importedTasksCount,
         int importedNotesCount,
         int importedTagsCount,
+        int importedActionsCount,
         String message
 ) {
 }

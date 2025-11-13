@@ -1,6 +1,7 @@
 package com.task_management.repository;
 
 import com.task_management.entity.Action;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,4 +24,7 @@ public interface ActionRepository extends JpaRepository<Action, UUID> {
     Page<Action> searchInTask(@Param("taskId") UUID taskId, @Param("q") String q, Pageable pageable);
     
     boolean existsByIdAndTaskId(UUID actionId, UUID taskId);
+    
+    @Query("select a from Action a where a.task.project.id = :projectId")
+    List<Action> findByProjectId(@Param("projectId") UUID projectId);
 }

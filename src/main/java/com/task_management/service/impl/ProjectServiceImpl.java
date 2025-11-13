@@ -6,6 +6,7 @@ import com.task_management.dto.ProjectImportReq;
 import com.task_management.dto.ProjectImportRes;
 import com.task_management.dto.ProjectRes;
 import com.task_management.dto.ProjectUpdateReq;
+import com.task_management.entity.Action;
 import com.task_management.entity.Note;
 import com.task_management.entity.Project;
 import com.task_management.entity.Tag;
@@ -13,6 +14,7 @@ import com.task_management.entity.Task;
 import com.task_management.exception.BadRequestException;
 import com.task_management.exception.NotFoundException;
 import com.task_management.mapper.ProjectMapper;
+import com.task_management.repository.ActionRepository;
 import com.task_management.repository.NoteRepository;
 import com.task_management.repository.ProjectRepository;
 import com.task_management.repository.TagRepository;
@@ -25,7 +27,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service @RequiredArgsConstructor @Transactional
@@ -34,6 +38,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final TaskRepository tasks;
     private final NoteRepository notes;
     private final TagRepository tags;
+    private final ActionRepository actions;
     private final ProjectMapper mapper;
 
     @Override
@@ -88,6 +93,10 @@ public class ProjectServiceImpl implements ProjectService {
         int importedTasksCount = 0;
         int importedNotesCount = 0;
         int importedTagsCount = 0;
+        int importedActionsCount = 0;
+        
+        // Map to track old task ID to new task ID for action import
+        Map<UUID, Task> oldTaskIdToNewTask = new HashMap<>();
 
         // Import tasks if requested
         if (req.importTasks()) {
@@ -105,7 +114,8 @@ public class ProjectServiceImpl implements ProjectService {
                         .endDay(sourceTask.getEndDay())
                         .color(sourceTask.getColor())
                         .build();
-                tasks.save(newTask);
+                newTask = tasks.save(newTask);
+                oldTaskIdToNewTask.put(sourceTask.getId(), newTask);
                 importedTasksCount++;
             }
         }
@@ -144,14 +154,32 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
 
+        // Import actions if requested (only if tasks were also imported)
+        if (req.importActions() && req.importTasks() && !oldTaskIdToNewTask.isEmpty()) {
+            List<Action> sourceActions = actions.findByProjectId(req.sourceProjectId());
+            for (Action sourceAction : sourceActions) {
+                Task newTask = oldTaskIdToNewTask.get(sourceAction.getTask().getId());
+                if (newTask != null) {
+                    Action newAction = Action.builder()
+                            .task(newTask)
+                            .details(sourceAction.getDetails())
+                            .day(sourceAction.getDay())
+                            .build();
+                    actions.save(newAction);
+                    importedActionsCount++;
+                }
+            }
+        }
+
         return new ProjectImportRes(
                 newProject.getId(),
                 newProject.getName(),
                 importedTasksCount,
                 importedNotesCount,
                 importedTagsCount,
-                String.format("Successfully imported project '%s' with %d tasks, %d notes, and %d tags",
-                      newProject.getName(), importedTasksCount, importedNotesCount, importedTagsCount)
+                importedActionsCount,
+                String.format("Successfully imported project '%s' with %d tasks, %d notes, %d tags, and %d actions",
+                      newProject.getName(), importedTasksCount, importedNotesCount, importedTagsCount, importedActionsCount)
         );
     }
 
